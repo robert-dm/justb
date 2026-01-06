@@ -54,7 +54,7 @@ MONGODB_URI=mongodb://localhost:27017/justb
 3. Click "Connect" and get your connection string
 4. Update `.env`:
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/justb
+MONGODB_URI=your-mongodb-atlas-connection-string-here
 ```
 
 #### Stripe Setup
