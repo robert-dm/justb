@@ -7,10 +7,21 @@ const connectDB = require('./config/database');
 // Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
+
+// Middleware to ensure DB connection for serverless
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Database connection unavailable'
+    });
+  }
+});
 
 // Middleware
 app.use(cors({
@@ -88,9 +99,15 @@ module.exports = app;
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend: http://localhost:${PORT}`);
-    console.log(`API: http://localhost:${PORT}/api`);
+  // Connect to database on startup for non-serverless
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Frontend: http://localhost:${PORT}`);
+      console.log(`API: http://localhost:${PORT}/api`);
+    });
+  }).catch(error => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   });
 }
