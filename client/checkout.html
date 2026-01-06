@@ -142,9 +142,11 @@
 
       } catch (error) {
         console.error('Error loading checkout:', error);
+        document.getElementById('loadingMessage').style.display = 'block';
         document.getElementById('loadingMessage').innerHTML = `
-          <p style="color: var(--primary-color);">Failed to load checkout</p>
-          <a href="/bookings" class="btn btn-primary" style="margin-top: 16px;">Back to Bookings</a>
+          <p style="color: var(--primary-color); margin-bottom: 16px;">Failed to load checkout</p>
+          <p style="color: var(--text-light); margin-bottom: 16px;">${error.message || 'Unknown error'}</p>
+          <a href="/bookings" class="btn btn-primary">Back to Bookings</a>
         `;
       }
     }

@@ -114,9 +114,11 @@ exports.getBooking = async (req, res) => {
       booking
     });
   } catch (error) {
+    console.error('Get booking error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching booking'
+      message: 'Error fetching booking',
+      error: error.message
     });
   }
 };
