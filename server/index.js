@@ -25,7 +25,7 @@ app.use(async (req, res, next) => {
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.VERCEL ? true : (process.env.CLIENT_URL || 'http://localhost:3000'),
   credentials: true
 }));
 
