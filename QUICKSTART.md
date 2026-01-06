@@ -38,7 +38,7 @@ The default `.env` file is already configured for local MongoDB.
 3. Get connection string
 4. Update `.env`:
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/justb
+MONGODB_URI=your-mongodb-atlas-connection-string-here
 ```
 
 ## 3. Get Stripe Keys (Required for Payments)
