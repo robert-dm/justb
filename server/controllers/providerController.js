@@ -88,6 +88,30 @@ exports.getProvider = async (req, res) => {
 // Create provider profile
 exports.createProvider = async (req, res) => {
   try {
+    // Validate required fields
+    const { businessName, description, address } = req.body;
+
+    if (!businessName || !description) {
+      return res.status(400).json({
+        success: false,
+        message: 'Business name and description are required'
+      });
+    }
+
+    if (!address || !address.street || !address.city || !address.zipCode || !address.country) {
+      return res.status(400).json({
+        success: false,
+        message: 'Complete address is required (street, city, zip code, country)'
+      });
+    }
+
+    if (!address.coordinates || !address.coordinates.lat || !address.coordinates.lng) {
+      return res.status(400).json({
+        success: false,
+        message: 'Coordinates (latitude and longitude) are required'
+      });
+    }
+
     const providerData = {
       ...req.body,
       userId: req.user.id
@@ -101,6 +125,17 @@ exports.createProvider = async (req, res) => {
     });
   } catch (error) {
     console.error('Create provider error:', error);
+
+    // Handle MongoDB validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: messages
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Error creating provider',

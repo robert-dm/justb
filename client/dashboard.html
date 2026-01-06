@@ -96,17 +96,8 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div class="form-group">
-            <label class="form-label">Latitude</label>
-            <input type="number" step="any" id="lat" class="form-input" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Longitude</label>
-            <input type="number" step="any" id="lng" class="form-input" required>
-          </div>
-        </div>
+        <input type="hidden" id="lat">
+        <input type="hidden" id="lng">
 
         <div class="form-group">
           <label style="display: flex; align-items: center; gap: 8px;">
@@ -254,8 +245,71 @@
       }
     }
 
+    // Geocode address to get coordinates
+    async function geocodeAddress(street, city, state, zipCode, country) {
+      try {
+        // Build address string
+        const addressParts = [street, city, state, zipCode, country].filter(p => p);
+        const address = addressParts.join(', ');
+
+        // Use Nominatim (OpenStreetMap) free geocoding service
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'justB Breakfast Marketplace'
+          }
+        });
+
+        const results = await response.json();
+
+        if (results && results.length > 0) {
+          return {
+            lat: parseFloat(results[0].lat),
+            lng: parseFloat(results[0].lon)
+          };
+        }
+
+        throw new Error('Address not found. Please check your address.');
+      } catch (error) {
+        throw new Error('Failed to geocode address: ' + error.message);
+      }
+    }
+
     async function saveProfile() {
       try {
+        // Validate required fields
+        if (!document.getElementById('businessName').value) {
+          showError('Business name is required');
+          return;
+        }
+
+        if (!document.getElementById('description').value) {
+          showError('Description is required');
+          return;
+        }
+
+        const street = document.getElementById('street').value;
+        const city = document.getElementById('city').value;
+        const zipCode = document.getElementById('zipCode').value;
+        const country = document.getElementById('country').value;
+
+        if (!street || !city || !zipCode || !country) {
+          showError('Please fill in complete address (street, city, zip code, country)');
+          return;
+        }
+
+        // Show loading message
+        showSuccess('Geocoding address...');
+
+        // Geocode the address to get coordinates
+        const state = document.getElementById('state').value;
+        const coordinates = await geocodeAddress(street, city, state, zipCode, country);
+
+        // Store coordinates in hidden fields
+        document.getElementById('lat').value = coordinates.lat;
+        document.getElementById('lng').value = coordinates.lng;
+
         const profileData = {
           businessName: document.getElementById('businessName').value,
           description: document.getElementById('description').value,
@@ -266,16 +320,16 @@
             zipCode: document.getElementById('zipCode').value,
             country: document.getElementById('country').value,
             coordinates: {
-              lat: parseFloat(document.getElementById('lat').value),
-              lng: parseFloat(document.getElementById('lng').value)
+              lat: coordinates.lat,
+              lng: coordinates.lng
             }
           },
           serviceType: {
             delivery: document.getElementById('deliveryAvailable').checked,
             pickup: document.getElementById('pickupAvailable').checked
           },
-          deliveryRadius: parseFloat(document.getElementById('deliveryRadius').value),
-          deliveryFee: parseFloat(document.getElementById('deliveryFee').value)
+          deliveryRadius: parseFloat(document.getElementById('deliveryRadius').value) || 5,
+          deliveryFee: parseFloat(document.getElementById('deliveryFee').value) || 0
         };
 
         let data;
