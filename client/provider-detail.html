@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Provider Details - justB</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="container">
+      <div class="nav">
+        <a href="/" class="logo">
+          <span>🥐</span> justB
+        </a>
+        <ul class="nav-links"></ul>
+      </div>
+    </nav>
+  </header>
+
+  <div id="loadingMessage" style="text-align: center; padding: 60px;">
+    <p>Loading provider details...</p>
+  </div>
+
+  <!-- Provider Content -->
+  <div id="providerContent" class="container" style="display: none;">
+    <!-- Provider Images -->
+    <div class="provider-header">
+      <div id="providerImages"></div>
+    </div>
+
+    <!-- Provider Info -->
+    <div class="provider-info">
+      <div class="provider-details">
+        <div id="providerMeta"></div>
+
+        <hr style="margin: 32px 0; border: none; border-top: 1px solid var(--border-color);">
+
+        <h2>About</h2>
+        <p id="providerDescription" style="color: var(--text-dark); line-height: 1.8; margin-top: 16px;"></p>
+
+        <hr style="margin: 32px 0; border: none; border-top: 1px solid var(--border-color);">
+
+        <h2>Menu</h2>
+        <div id="menuItems" class="menu-grid" style="margin-top: 24px;"></div>
+
+        <hr style="margin: 32px 0; border: none; border-top: 1px solid var(--border-color);">
+
+        <h2>Service Information</h2>
+        <div id="serviceInfo" style="margin-top: 16px; color: var(--text-dark);"></div>
+      </div>
+
+      <!-- Booking Card -->
+      <div>
+        <div class="booking-card" id="bookingCard">
+          <div style="margin-bottom: 16px;">
+            <span style="font-size: 24px; font-weight: 600;">Order Summary</span>
+          </div>
+
+          <div id="orderItems" style="margin-bottom: 16px;">
+            <p style="color: var(--text-light); text-align: center; padding: 20px;">
+              Add items from the menu to start your order
+            </p>
+          </div>
+
+          <hr style="margin: 16px 0; border: none; border-top: 1px solid var(--border-color);">
+
+          <div id="pricingDetails" style="display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Subtotal</span>
+              <span id="subtotal">$0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Delivery Fee</span>
+              <span id="deliveryFee">$0.00</span>
+            </div>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; margin-bottom: 16px;">
+              <span>Total</span>
+              <span id="total">$0.00</span>
+            </div>
+          </div>
+
+          <div id="bookingForm" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Delivery Type</label>
+              <select id="deliveryType" class="form-select" onchange="updateDeliveryFee()">
+                <option value="">Select delivery type</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Delivery Date</label>
+              <input type="date" id="deliveryDate" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Delivery Time</label>
+              <select id="deliveryTime" class="form-select">
+                <option value="">Select time</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="addressGroup" style="display: none;">
+              <label class="form-label">Delivery Address</label>
+              <input type="text" id="deliveryAddress" class="form-input" placeholder="Street address">
+              <input type="text" id="deliveryCity" class="form-input" placeholder="City" style="margin-top: 8px;">
+              <textarea id="deliveryNotes" class="form-textarea" placeholder="Special delivery instructions (optional)" style="margin-top: 8px;"></textarea>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="proceedToCheckout()">
+              Proceed to Checkout
+            </button>
+          </div>
+
+          <div id="loginPrompt" style="display: none; text-align: center; padding: 20px;">
+            <p style="margin-bottom: 16px;">Please login to place an order</p>
+            <a href="/login" class="btn btn-primary">Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 justB. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/booking.js"></script>
+  <script>
+    let currentProvider = null;
+    let cart = [];
+
+    async function loadProvider() {
+      try {
+        const providerId = window.location.pathname.split('/').pop();
+        const data = await apiRequest(`/providers/${providerId}`);
+
+        currentProvider = data.provider;
+        displayProvider(currentProvider);
+
+      } catch (error) {
+        console.error('Error loading provider:', error);
+        alert('Failed to load provider details');
+        window.location.href = '/providers';
+      }
+    }
+
+    function displayProvider(provider) {
+      document.getElementById('loadingMessage').style.display = 'none';
+      document.getElementById('providerContent').style.display = 'block';
+
+      document.title = `${provider.businessName} - justB`;
+
+      // Images
+      const imagesHtml = provider.images.length > 0
+        ? `<div class="provider-images">${provider.images.slice(0, 5).map(img => `<img src="${img}" alt="${provider.businessName}">`).join('')}</div>`
+        : '<div style="height: 300px; background-color: var(--background-light); display: flex; align-items: center; justify-content: center; border-radius: 12px;">No images available</div>';
+
+      document.getElementById('providerImages').innerHTML = imagesHtml;
+
+      // Meta info
+      document.getElementById('providerMeta').innerHTML = `
+        <h1 style="font-size: 32px; margin-bottom: 16px;">${provider.businessName}</h1>
+        <div class="provider-meta">
+          <div class="rating">
+            <span class="star">⭐</span>
+            <span style="font-weight: 600;">${provider.rating.average.toFixed(1)}</span>
+            <span>(${provider.rating.count} reviews)</span>
+          </div>
+          <span>•</span>
+          <span>📍 ${provider.address.city}, ${provider.address.state}</span>
+          <span>•</span>
+          ${provider.serviceType.delivery ? '<span class="badge badge-success">Delivery</span>' : ''}
+          ${provider.serviceType.pickup ? '<span class="badge badge-info">Pickup</span>' : ''}
+        </div>
+      `;
+
+      // Description
+      document.getElementById('providerDescription').textContent = provider.description;
+
+      // Menu
+      displayMenu(provider.menu);
+
+      // Service info
+      document.getElementById('serviceInfo').innerHTML = `
+        <div style="display: grid; gap: 12px;">
+          ${provider.serviceType.delivery ? `
+            <div>
+              <strong>Delivery:</strong> Available within ${provider.deliveryRadius} km
+              ${provider.deliveryFee > 0 ? ` (${formatCurrency(provider.deliveryFee)} fee)` : ' (Free)'}
+              ${provider.minimumOrder > 0 ? ` • Minimum order: ${formatCurrency(provider.minimumOrder)}` : ''}
+            </div>
+          ` : ''}
+          ${provider.serviceType.pickup ? '<div><strong>Pickup:</strong> Available at store location</div>' : ''}
+        </div>
+      `;
+
+      // Setup delivery type options
+      setupDeliveryOptions(provider);
+
+      // Setup delivery time slots
+      setupTimeSlots(provider.deliverySlots);
+
+      // Check if user is logged in
+      if (!isAuthenticated()) {
+        document.getElementById('loginPrompt').style.display = 'block';
+      }
+    }
+
+    function displayMenu(menu) {
+      const menuContainer = document.getElementById('menuItems');
+
+      if (!menu || menu.length === 0) {
+        menuContainer.innerHTML = '<p style="color: var(--text-light);">No menu items available</p>';
+        return;
+      }
+
+      menuContainer.innerHTML = menu
+        .filter(item => item.available)
+        .map(item => `
+          <div class="menu-item">
+            <div class="menu-item-info">
+              <h4>${item.name}</h4>
+              <p>${item.description || 'Delicious breakfast item'}</p>
+              <span class="badge badge-info" style="margin-top: 4px;">${item.category}</span>
+            </div>
+            <div class="menu-item-action">
+              <div class="price" style="font-size: 18px; margin-right: 16px;">
+                ${formatCurrency(item.price)}
+              </div>
+              <div class="quantity-control" id="control-${item._id}">
+                <button class="quantity-btn" onclick="updateQuantity('${item._id}', -1)">-</button>
+                <span id="qty-${item._id}" style="min-width: 20px; text-align: center;">0</span>
+                <button class="quantity-btn" onclick="updateQuantity('${item._id}', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+    }
+
+    function setupDeliveryOptions(provider) {
+      const select = document.getElementById('deliveryType');
+      let options = '<option value="">Select delivery type</option>';
+
+      if (provider.serviceType.delivery) {
+        options += '<option value="delivery">Delivery</option>';
+      }
+      if (provider.serviceType.pickup) {
+        options += '<option value="pickup">Pickup</option>';
+      }
+
+      select.innerHTML = options;
+    }
+
+    function setupTimeSlots(slots) {
+      const select = document.getElementById('deliveryTime');
+      let options = '<option value="">Select time</option>';
+
+      if (slots && slots.length > 0) {
+        options += slots.map(slot => `<option value="${slot.time}">${formatTime(slot.time)}</option>`).join('');
+      } else {
+        // Default time slots
+        const defaultSlots = ['07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00'];
+        options += defaultSlots.map(time => `<option value="${time}">${formatTime(time)}</option>`).join('');
+      }
+
+      select.innerHTML = options;
+    }
+
+    function updateQuantity(itemId, change) {
+      const qtyElement = document.getElementById(`qty-${itemId}`);
+      let currentQty = parseInt(qtyElement.textContent);
+      let newQty = Math.max(0, currentQty + change);
+
+      qtyElement.textContent = newQty;
+
+      // Update cart
+      const item = currentProvider.menu.find(m => m._id === itemId);
+      const cartIndex = cart.findIndex(c => c.menuItemId === itemId);
+
+      if (newQty > 0) {
+        if (cartIndex >= 0) {
+          cart[cartIndex].quantity = newQty;
+        } else {
+          cart.push({
+            menuItemId: itemId,
+            name: item.name,
+            price: item.price,
+            quantity: newQty
+          });
+        }
+      } else {
+        if (cartIndex >= 0) {
+          cart.splice(cartIndex, 1);
+        }
+      }
+
+      updateOrderSummary();
+    }
+
+    function updateOrderSummary() {
+      const orderItems = document.getElementById('orderItems');
+      const pricingDetails = document.getElementById('pricingDetails');
+      const bookingForm = document.getElementById('bookingForm');
+
+      if (cart.length === 0) {
+        orderItems.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 20px;">Add items from the menu to start your order</p>';
+        pricingDetails.style.display = 'none';
+        bookingForm.style.display = 'none';
+        return;
+      }
+
+      orderItems.innerHTML = cart.map(item => `
+        <div style="display: flex; justify-content: between; margin-bottom: 12px;">
+          <div style="flex: 1;">
+            <div style="font-weight: 500;">${item.name}</div>
+            <div style="font-size: 14px; color: var(--text-light);">Qty: ${item.quantity}</div>
+          </div>
+          <div style="font-weight: 600;">
+            ${formatCurrency(item.price * item.quantity)}
+          </div>
+        </div>
+      `).join('');
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const deliveryType = document.getElementById('deliveryType').value;
+      const deliveryFee = deliveryType === 'delivery' ? currentProvider.deliveryFee : 0;
+      const total = subtotal + deliveryFee;
+
+      document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+      document.getElementById('deliveryFee').textContent = formatCurrency(deliveryFee);
+      document.getElementById('total').textContent = formatCurrency(total);
+
+      pricingDetails.style.display = 'block';
+
+      if (isAuthenticated()) {
+        bookingForm.style.display = 'block';
+      }
+    }
+
+    function updateDeliveryFee() {
+      const deliveryType = document.getElementById('deliveryType').value;
+      const addressGroup = document.getElementById('addressGroup');
+
+      if (deliveryType === 'delivery') {
+        addressGroup.style.display = 'block';
+      } else {
+        addressGroup.style.display = 'none';
+      }
+
+      updateOrderSummary();
+    }
+
+    function proceedToCheckout() {
+      if (!isAuthenticated()) {
+        alert('Please login to place an order');
+        window.location.href = '/login';
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert('Please add items to your order');
+        return;
+      }
+
+      const deliveryType = document.getElementById('deliveryType').value;
+      const deliveryDate = document.getElementById('deliveryDate').value;
+      const deliveryTime = document.getElementById('deliveryTime').value;
+
+      if (!deliveryType || !deliveryDate || !deliveryTime) {
+        alert('Please fill in all delivery details');
+        return;
+      }
+
+      if (deliveryType === 'delivery') {
+        const address = document.getElementById('deliveryAddress').value;
+        const city = document.getElementById('deliveryCity').value;
+
+        if (!address || !city) {
+          alert('Please enter delivery address');
+          return;
+        }
+      }
+
+      // Create booking
+      createBooking();
+    }
+
+    async function createBooking() {
+      try {
+        const user = getUser();
+        const deliveryType = document.getElementById('deliveryType').value;
+        const deliveryDate = document.getElementById('deliveryDate').value;
+        const deliveryTime = document.getElementById('deliveryTime').value;
+
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const deliveryFee = deliveryType === 'delivery' ? currentProvider.deliveryFee : 0;
+        const total = subtotal + deliveryFee;
+
+        const bookingData = {
+          providerId: currentProvider._id,
+          items: cart,
+          deliveryDate,
+          deliveryTime,
+          deliveryType,
+          pricing: {
+            subtotal,
+            deliveryFee,
+            tax: 0,
+            total
+          }
+        };
+
+        if (deliveryType === 'delivery') {
+          bookingData.deliveryAddress = {
+            street: document.getElementById('deliveryAddress').value,
+            city: document.getElementById('deliveryCity').value,
+            notes: document.getElementById('deliveryNotes').value
+          };
+        }
+
+        const data = await apiRequest('/bookings', {
+          method: 'POST',
+          body: JSON.stringify(bookingData)
+        });
+
+        if (data.success) {
+          // Redirect to payment
+          window.location.href = `/checkout.html?booking=${data.booking._id}`;
+        }
+
+      } catch (error) {
+        console.error('Error creating booking:', error);
+        alert('Failed to create booking. Please try again.');
+      }
+    }
+
+    // Set minimum date to tomorrow
+    document.addEventListener('DOMContentLoaded', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const minDate = tomorrow.toISOString().split('T')[0];
+      document.getElementById('deliveryDate').setAttribute('min', minDate);
+    });
+
+    // Load provider on page load
+    loadProvider();
+  </script>
+</body>
+</html>

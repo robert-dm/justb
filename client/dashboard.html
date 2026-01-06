@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Provider Dashboard - justB</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="container">
+      <div class="nav">
+        <a href="/" class="logo">
+          <span>🥐</span> justB
+        </a>
+        <ul class="nav-links"></ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Dashboard Content -->
+  <section class="container" style="min-height: 70vh; padding: 40px 0;">
+    <h1 style="margin-bottom: 32px;">Provider Dashboard</h1>
+
+    <div id="error-container" class="hidden"></div>
+    <div id="success-container" class="hidden"></div>
+
+    <!-- Tabs -->
+    <div style="border-bottom: 2px solid var(--border-color); margin-bottom: 32px;">
+      <div style="display: flex; gap: 32px;">
+        <button class="tab-btn active" onclick="showTab('orders')">Orders</button>
+        <button class="tab-btn" onclick="showTab('profile')">Profile</button>
+        <button class="tab-btn" onclick="showTab('menu')">Menu</button>
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div id="orders-tab" class="tab-content">
+      <h2 style="margin-bottom: 24px;">Incoming Orders</h2>
+
+      <div id="ordersLoading" style="text-align: center; padding: 40px;">
+        <p>Loading orders...</p>
+      </div>
+
+      <div id="ordersContainer" style="display: none;"></div>
+
+      <div id="noOrders" class="hidden" style="text-align: center; padding: 60px 20px;">
+        <div style="font-size: 64px; margin-bottom: 16px;">📦</div>
+        <h3>No orders yet</h3>
+        <p style="color: var(--text-light);">Orders will appear here when customers place them</p>
+      </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div id="profile-tab" class="tab-content hidden">
+      <h2 style="margin-bottom: 24px;">Business Profile</h2>
+
+      <div id="profileForm" style="max-width: 600px;">
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" id="businessName" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="description" class="form-textarea" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Street Address</label>
+          <input type="text" id="street" class="form-input" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" id="city" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" id="state" class="form-input">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Zip Code</label>
+            <input type="text" id="zipCode" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <input type="text" id="country" class="form-input" value="USA" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">Latitude</label>
+            <input type="number" step="any" id="lat" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Longitude</label>
+            <input type="number" step="any" id="lng" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="deliveryAvailable">
+            Offer Delivery
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="pickupAvailable">
+            Offer Pickup
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Radius (km)</label>
+          <input type="number" id="deliveryRadius" class="form-input" value="5">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Fee ($)</label>
+          <input type="number" step="0.01" id="deliveryFee" class="form-input" value="0">
+        </div>
+
+        <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+
+    <!-- Menu Tab -->
+    <div id="menu-tab" class="tab-content hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <h2>Menu Items</h2>
+        <button class="btn btn-primary" onclick="showAddItemForm()">Add Menu Item</button>
+      </div>
+
+      <div id="addItemForm" class="card hidden" style="margin-bottom: 24px;">
+        <div class="card-content" style="padding: 24px;">
+          <h3 style="margin-bottom: 16px;">Add Menu Item</h3>
+
+          <div class="form-group">
+            <label class="form-label">Item Name</label>
+            <input type="text" id="itemName" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="itemDescription" class="form-textarea" rows="3"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Price ($)</label>
+              <input type="number" step="0.01" id="itemPrice" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="itemCategory" class="form-select">
+                <option value="traditional">Traditional</option>
+                <option value="continental">Continental</option>
+                <option value="vegan">Vegan</option>
+                <option value="gluten-free">Gluten-Free</option>
+                <option value="sweet">Sweet</option>
+                <option value="savory">Savory</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button class="btn btn-primary" onclick="addMenuItem()">Add Item</button>
+            <button class="btn btn-secondary" onclick="hideAddItemForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="menuItemsContainer" class="menu-grid"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 justB. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script src="/js/booking.js"></script>
+  <script>
+    // Redirect if not provider
+    const user = getUser();
+    if (!user || user.role !== 'provider') {
+      alert('Access denied. Provider account required.');
+      window.location.href = '/';
+    }
+
+    let currentProvider = null;
+
+    // Tab management
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+      event.target.classList.add('active');
+
+      if (tabName === 'orders') {
+        loadOrders();
+      } else if (tabName === 'profile') {
+        loadProfile();
+      } else if (tabName === 'menu') {
+        loadMenu();
+      }
+    }
+
+    // Load provider profile
+    async function loadProfile() {
+      try {
+        const data = await apiRequest('/providers/my-profile');
+        currentProvider = data.provider;
+
+        // Populate form
+        document.getElementById('businessName').value = currentProvider.businessName || '';
+        document.getElementById('description').value = currentProvider.description || '';
+        document.getElementById('street').value = currentProvider.address?.street || '';
+        document.getElementById('city').value = currentProvider.address?.city || '';
+        document.getElementById('state').value = currentProvider.address?.state || '';
+        document.getElementById('zipCode').value = currentProvider.address?.zipCode || '';
+        document.getElementById('country').value = currentProvider.address?.country || 'USA';
+        document.getElementById('lat').value = currentProvider.address?.coordinates?.lat || '';
+        document.getElementById('lng').value = currentProvider.address?.coordinates?.lng || '';
+        document.getElementById('deliveryAvailable').checked = currentProvider.serviceType?.delivery || false;
+        document.getElementById('pickupAvailable').checked = currentProvider.serviceType?.pickup || false;
+        document.getElementById('deliveryRadius').value = currentProvider.deliveryRadius || 5;
+        document.getElementById('deliveryFee').value = currentProvider.deliveryFee || 0;
+
+      } catch (error) {
+        if (error.message.includes('not found')) {
+          // No profile yet - show empty form
+          showSuccess('Please complete your provider profile');
+        } else {
+          showError('Failed to load profile');
+        }
+      }
+    }
+
+    async function saveProfile() {
+      try {
+        const profileData = {
+          businessName: document.getElementById('businessName').value,
+          description: document.getElementById('description').value,
+          address: {
+            street: document.getElementById('street').value,
+            city: document.getElementById('city').value,
+            state: document.getElementById('state').value,
+            zipCode: document.getElementById('zipCode').value,
+            country: document.getElementById('country').value,
+            coordinates: {
+              lat: parseFloat(document.getElementById('lat').value),
+              lng: parseFloat(document.getElementById('lng').value)
+            }
+          },
+          serviceType: {
+            delivery: document.getElementById('deliveryAvailable').checked,
+            pickup: document.getElementById('pickupAvailable').checked
+          },
+          deliveryRadius: parseFloat(document.getElementById('deliveryRadius').value),
+          deliveryFee: parseFloat(document.getElementById('deliveryFee').value)
+        };
+
+        let data;
+        if (currentProvider) {
+          data = await apiRequest(`/providers/${currentProvider._id}`, {
+            method: 'PUT',
+            body: JSON.stringify(profileData)
+          });
+        } else {
+          data = await apiRequest('/providers', {
+            method: 'POST',
+            body: JSON.stringify(profileData)
+          });
+        }
+
+        currentProvider = data.provider;
+        showSuccess('Profile saved successfully!');
+
+      } catch (error) {
+        showError(error.message || 'Failed to save profile');
+      }
+    }
+
+    // Load orders
+    async function loadOrders() {
+      try {
+        document.getElementById('ordersLoading').style.display = 'block';
+        document.getElementById('ordersContainer').style.display = 'none';
+        document.getElementById('noOrders').classList.add('hidden');
+
+        const data = await apiRequest('/bookings/provider');
+
+        document.getElementById('ordersLoading').style.display = 'none';
+
+        if (data.bookings.length === 0) {
+          document.getElementById('noOrders').classList.remove('hidden');
+          return;
+        }
+
+        document.getElementById('ordersContainer').style.display = 'block';
+        displayOrders(data.bookings);
+
+      } catch (error) {
+        console.error('Error loading orders:', error);
+        document.getElementById('ordersLoading').innerHTML = '<p style="color: var(--primary-color);">Failed to load orders</p>';
+      }
+    }
+
+    function displayOrders(bookings) {
+      const container = document.getElementById('ordersContainer');
+
+      container.innerHTML = bookings.map(booking => {
+        const customer = booking.userId;
+
+        return `
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-content" style="padding: 24px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                <div>
+                  ${getBookingStatusBadge(booking.status)}
+                  ${getPaymentStatusBadge(booking.payment.status)}
+                </div>
+                <div style="font-size: 20px; font-weight: 600;">
+                  ${formatCurrency(booking.pricing.total)}
+                </div>
+              </div>
+
+              <h3>${customer.name}</h3>
+              <p style="color: var(--text-light); margin-bottom: 16px;">
+                ${customer.email} • ${customer.phone || 'No phone'}
+              </p>
+
+              <div style="margin-bottom: 16px;">
+                <strong>Delivery:</strong>
+                ${formatDate(booking.deliveryDate)} at ${formatTime(booking.deliveryTime)} •
+                ${booking.deliveryType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
+              </div>
+
+              ${booking.deliveryAddress && booking.deliveryType === 'delivery' ? `
+                <div style="margin-bottom: 16px;">
+                  <strong>Address:</strong>
+                  ${booking.deliveryAddress.street}, ${booking.deliveryAddress.city}
+                  ${booking.deliveryAddress.notes ? `<br><em>${booking.deliveryAddress.notes}</em>` : ''}
+                </div>
+              ` : ''}
+
+              <div style="margin-bottom: 16px;">
+                <strong>Items:</strong>
+                <ul style="margin-top: 8px; padding-left: 20px;">
+                  ${booking.items.map(item => `
+                    <li>${item.quantity}x ${item.name}</li>
+                  `).join('')}
+                </ul>
+              </div>
+
+              ${booking.status !== 'cancelled' && booking.status !== 'completed' ? `
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                  ${booking.status === 'pending' || booking.status === 'confirmed' ? `
+                    <button class="btn btn-primary" onclick="updateOrderStatus('${booking._id}', 'confirmed')">
+                      Accept Order
+                    </button>
+                  ` : ''}
+                  ${booking.status === 'confirmed' ? `
+                    <button class="btn btn-primary" onclick="updateOrderStatus('${booking._id}', 'preparing')">
+                      Start Preparing
+                    </button>
+                  ` : ''}
+                  ${booking.status === 'preparing' ? `
+                    <button class="btn btn-primary" onclick="updateOrderStatus('${booking._id}', 'on-the-way')">
+                      Out for Delivery
+                    </button>
+                  ` : ''}
+                  ${booking.status === 'on-the-way' || booking.status === 'preparing' ? `
+                    <button class="btn btn-primary" onclick="updateOrderStatus('${booking._id}', 'delivered')">
+                      Mark as Delivered
+                    </button>
+                  ` : ''}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateOrderStatus(bookingId, status) {
+      try {
+        await apiRequest(`/bookings/${bookingId}/status`, {
+          method: 'PUT',
+          body: JSON.stringify({ status })
+        });
+
+        showSuccess('Order status updated!');
+        loadOrders();
+
+      } catch (error) {
+        showError('Failed to update order status');
+      }
+    }
+
+    // Menu management
+    async function loadMenu() {
+      if (!currentProvider) {
+        await loadProfile();
+      }
+
+      if (currentProvider && currentProvider.menu) {
+        displayMenu(currentProvider.menu);
+      }
+    }
+
+    function displayMenu(menu) {
+      const container = document.getElementById('menuItemsContainer');
+
+      if (!menu || menu.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 40px;">No menu items yet. Add your first item!</p>';
+        return;
+      }
+
+      container.innerHTML = menu.map(item => `
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>${item.name}</h4>
+            <p>${item.description}</p>
+            <span class="badge badge-info">${item.category}</span>
+          </div>
+          <div style="text-align: right;">
+            <div class="price" style="font-size: 20px; margin-bottom: 8px;">
+              ${formatCurrency(item.price)}
+            </div>
+            <span class="badge ${item.available ? 'badge-success' : 'badge-danger'}">
+              ${item.available ? 'Available' : 'Unavailable'}
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showAddItemForm() {
+      document.getElementById('addItemForm').classList.remove('hidden');
+    }
+
+    function hideAddItemForm() {
+      document.getElementById('addItemForm').classList.add('hidden');
+      // Clear form
+      document.getElementById('itemName').value = '';
+      document.getElementById('itemDescription').value = '';
+      document.getElementById('itemPrice').value = '';
+    }
+
+    async function addMenuItem() {
+      try {
+        if (!currentProvider) {
+          alert('Please save your profile first');
+          showTab('profile');
+          return;
+        }
+
+        const newItem = {
+          name: document.getElementById('itemName').value,
+          description: document.getElementById('itemDescription').value,
+          price: parseFloat(document.getElementById('itemPrice').value),
+          category: document.getElementById('itemCategory').value,
+          available: true
+        };
+
+        if (!newItem.name || !newItem.price) {
+          alert('Please fill in all required fields');
+          return;
+        }
+
+        const updatedMenu = [...(currentProvider.menu || []), newItem];
+
+        const data = await apiRequest(`/providers/${currentProvider._id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ menu: updatedMenu })
+        });
+
+        currentProvider = data.provider;
+        displayMenu(currentProvider.menu);
+        hideAddItemForm();
+        showSuccess('Menu item added successfully!');
+
+      } catch (error) {
+        showError('Failed to add menu item');
+      }
+    }
+
+    // Initialize
+    loadOrders();
+  </script>
+
+  <style>
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-dark);
+    }
+
+    .tab-btn.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+  </style>
+</body>
+</html>

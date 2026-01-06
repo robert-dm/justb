@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - justB</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="container">
+      <div class="nav">
+        <a href="/" class="logo">
+          <span>🥐</span> justB
+        </a>
+        <ul class="nav-links"></ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Profile Content -->
+  <section class="container" style="min-height: 70vh; padding: 40px 0;">
+    <div style="max-width: 600px; margin: 0 auto;">
+      <h1 style="margin-bottom: 32px;">My Profile</h1>
+
+      <div id="error-container" class="hidden"></div>
+      <div id="success-container" class="hidden"></div>
+
+      <div class="card">
+        <div class="card-content" style="padding: 32px;">
+          <form id="profileForm">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="name" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="email" class="form-input" disabled>
+              <small style="color: var(--text-light);">Email cannot be changed</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="tel" id="phone" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Street Address</label>
+              <input type="text" id="street" class="form-input">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" id="city" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <input type="text" id="state" class="form-input">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label">Zip Code</label>
+                <input type="text" id="zipCode" class="form-input">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Country</label>
+                <input type="text" id="country" class="form-input">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              Save Changes
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-content" style="padding: 32px;">
+          <h3 style="margin-bottom: 16px;">Account Information</h3>
+          <div style="display: grid; gap: 12px; color: var(--text-dark);">
+            <div>
+              <strong>Account Type:</strong>
+              <span id="userRole" style="margin-left: 8px;"></span>
+            </div>
+            <div>
+              <strong>Member Since:</strong>
+              <span id="memberSince" style="margin-left: 8px;"></span>
+            </div>
+          </div>
+
+          <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--border-color);">
+
+          <button class="btn btn-outline" style="width: 100%; color: var(--primary-color); border-color: var(--primary-color);" onclick="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 justB. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // Redirect if not authenticated
+    if (!isAuthenticated()) {
+      window.location.href = '/login';
+    }
+
+    async function loadProfile() {
+      try {
+        const data = await apiRequest('/auth/me');
+        const user = data.user;
+
+        // Update form
+        document.getElementById('name').value = user.name || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('street').value = user.address?.street || '';
+        document.getElementById('city').value = user.address?.city || '';
+        document.getElementById('state').value = user.address?.state || '';
+        document.getElementById('zipCode').value = user.address?.zipCode || '';
+        document.getElementById('country').value = user.address?.country || '';
+
+        // Update account info
+        document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        document.getElementById('memberSince').textContent = formatDate(user.createdAt || new Date());
+
+      } catch (error) {
+        showError('Failed to load profile');
+      }
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      try {
+        hideMessage('error-container');
+        hideMessage('success-container');
+
+        const profileData = {
+          name: document.getElementById('name').value,
+          phone: document.getElementById('phone').value,
+          address: {
+            street: document.getElementById('street').value,
+            city: document.getElementById('city').value,
+            state: document.getElementById('state').value,
+            zipCode: document.getElementById('zipCode').value,
+            country: document.getElementById('country').value
+          }
+        };
+
+        const data = await apiRequest('/auth/profile', {
+          method: 'PUT',
+          body: JSON.stringify(profileData)
+        });
+
+        if (data.success) {
+          setUser(data.user);
+          showSuccess('Profile updated successfully!');
+          updateNavigation();
+        }
+
+      } catch (error) {
+        showError(error.message || 'Failed to update profile');
+      }
+    });
+
+    loadProfile();
+  </script>
+</body>
+</html>
