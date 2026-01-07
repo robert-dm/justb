@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investor Portal - justB</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .investor-hero {
+      background: linear-gradient(135deg, rgba(255, 90, 95, 0.95) 0%, rgba(0, 166, 153, 0.95) 100%);
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .investor-hero h1 {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .investor-hero p {
+      font-size: 24px;
+      margin-bottom: 32px;
+      opacity: 0.95;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+      margin: 60px 0;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 32px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-number {
+      font-size: 48px;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: var(--text-light);
+    }
+
+    .nav-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 60px 0;
+    }
+
+    .nav-card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      transition: all 0.3s;
+      text-decoration: none;
+      color: var(--text-dark);
+      display: block;
+    }
+
+    .nav-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .nav-card-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .nav-card h3 {
+      margin-bottom: 12px;
+      color: var(--primary-color);
+    }
+
+    .cta-section {
+      background: var(--background-light);
+      padding: 80px 0;
+      text-align: center;
+      margin-top: 80px;
+    }
+
+    .confidential-notice {
+      background: #FFF3CD;
+      border: 2px solid #FFE69C;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 32px 0;
+      text-align: center;
+      color: #856404;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="container">
+      <div class="nav">
+        <a href="/" class="logo">
+          <span>🥐</span> justB
+        </a>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/providers">Platform</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="investor-hero">
+    <div class="container">
+      <h1>Invest in the Future of Travel Breakfast</h1>
+      <p>Connecting 60M+ tourists with authentic local breakfast experiences</p>
+      <div style="margin-top: 32px;">
+        <span style="display: inline-block; background: rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 24px; font-size: 18px; font-weight: 600;">
+          Seed Round: $750K - $1.5M
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Stats -->
+  <section class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">$12B</div>
+        <div class="stat-label">Total Addressable Market</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-number">60M+</div>
+        <div class="stat-label">Annual Airbnb Guests</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-number">21%</div>
+        <div class="stat-label">Market Growth (CAGR)</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-number">$7M</div>
+        <div class="stat-label">Year 3 Revenue Target</div>
+      </div>
+    </div>
+
+    <div class="confidential-notice">
+      🔒 Confidential Investment Materials - For Qualified Investors Only
+    </div>
+  </section>
+
+  <!-- The Opportunity -->
+  <section class="container" style="margin: 80px auto;">
+    <h2 class="text-center" style="margin-bottom: 24px;">The Opportunity</h2>
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div class="card">
+        <div class="card-content" style="padding: 40px;">
+          <h3 style="color: var(--primary-color); margin-bottom: 16px;">The Problem</h3>
+          <p style="font-size: 18px; line-height: 1.8; margin-bottom: 32px;">
+            60 million Airbnb guests annually face the same frustration: <strong>no breakfast service in vacation rentals</strong>.
+            Unlike hotels, vacation rentals leave tourists searching for breakfast daily, wasting precious vacation time and
+            missing authentic local food experiences.
+          </p>
+
+          <h3 style="color: var(--primary-color); margin-bottom: 16px;">Our Solution</h3>
+          <p style="font-size: 18px; line-height: 1.8;">
+            <strong>justB</strong> is a marketplace connecting tourists with local breakfast providers for scheduled delivery
+            or pickup. Tourists pre-book breakfast for their entire stay, while local providers gain access to the lucrative
+            tourist market with predictable, recurring orders.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Cards -->
+  <section class="container">
+    <h2 class="text-center mb-4">Investor Resources</h2>
+    <div class="nav-cards">
+      <a href="/investor-summary.html" class="nav-card">
+        <div class="nav-card-icon">📊</div>
+        <h3>Executive Summary</h3>
+        <p>Comprehensive overview of the business opportunity, market analysis, and financial projections</p>
+      </a>
+
+      <a href="/investor-financials.html" class="nav-card">
+        <div class="nav-card-icon">💰</div>
+        <h3>Financial Projections</h3>
+        <p>Detailed 3-year revenue forecasts, unit economics, and return potential</p>
+      </a>
+
+      <a href="/investor-deck.html" class="nav-card">
+        <div class="nav-card-icon">🎯</div>
+        <h3>Pitch Deck</h3>
+        <p>Visual presentation outlining our vision, strategy, and investment opportunity</p>
+      </a>
+
+      <a href="/investor-faq.html" class="nav-card">
+        <div class="nav-card-icon">❓</div>
+        <h3>FAQ</h3>
+        <p>Answers to common investor questions about the business model and market</p>
+      </a>
+
+      <a href="/investor-market.html" class="nav-card">
+        <div class="nav-card-icon">🌍</div>
+        <h3>Market Research</h3>
+        <p>In-depth market analysis, competitive landscape, and growth trends</p>
+      </a>
+
+      <a href="https://justb.vercel.app" target="_blank" class="nav-card">
+        <div class="nav-card-icon">🚀</div>
+        <h3>Live Platform</h3>
+        <p>Experience the justB platform and see how it works for tourists and providers</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Why Now -->
+  <section class="container" style="margin: 80px auto;">
+    <h2 class="text-center mb-4">Why Now?</h2>
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+      <div style="padding: 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🌊</div>
+        <h3>Post-Pandemic Travel Boom</h3>
+        <p class="mt-2" style="color: var(--text-light);">Tourism reaching pre-2019 levels with pent-up demand</p>
+      </div>
+
+      <div style="padding: 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🏠</div>
+        <h3>Vacation Rental Growth</h3>
+        <p class="mt-2" style="color: var(--text-light);">Airbnb, VRBO at all-time highs, 21% annual growth</p>
+      </div>
+
+      <div style="padding: 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">📱</div>
+        <h3>Mobile-First Consumers</h3>
+        <p class="mt-2" style="color: var(--text-light);">85%+ of travelers book and plan on mobile devices</p>
+      </div>
+
+      <div style="padding: 24px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🍽️</div>
+        <h3>Food Delivery Normalized</h3>
+        <p class="mt-2" style="color: var(--text-light);">Consumers comfortable with online food ordering</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" id="contact">
+    <div class="container">
+      <h2 style="font-size: 36px; margin-bottom: 16px;">Ready to Learn More?</h2>
+      <p style="font-size: 18px; margin-bottom: 32px; color: var(--text-light);">
+        Join us in revolutionizing the vacation breakfast experience
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="mailto:investors@justb.com" class="btn btn-primary" style="font-size: 18px; padding: 16px 32px;">
+          📧 Contact Us: investors@justb.com
+        </a>
+        <a href="/investor-summary.html" class="btn btn-outline" style="font-size: 18px; padding: 16px 32px;">
+          📄 Read Executive Summary
+        </a>
+      </div>
+
+      <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 16px;">Investment Highlights</h3>
+        <div style="max-width: 600px; margin: 0 auto; text-align: left;">
+          <p style="margin-bottom: 12px;">✅ <strong>First-Mover Advantage</strong> - No established competitor in vacation breakfast niche</p>
+          <p style="margin-bottom: 12px;">✅ <strong>Strong Unit Economics</strong> - LTV:CAC ratio of 6:1+ at scale</p>
+          <p style="margin-bottom: 12px;">✅ <strong>Global Scalability</strong> - Model works in any tourist destination worldwide</p>
+          <p style="margin-bottom: 12px;">✅ <strong>Network Effects</strong> - More tourists attract more providers and vice versa</p>
+          <p>✅ <strong>Platform Built</strong> - Ready to launch with full-stack technology</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>&copy; 2026 justB. All rights reserved.</p>
+      <p style="margin-top: 8px; font-size: 14px;">Confidential Investment Materials</p>
+      <p style="margin-top: 16px; font-size: 12px; color: var(--text-light);">
+        These materials are confidential and intended solely for qualified investors.
+        Distribution or disclosure to third parties is prohibited without prior written consent.
+      </p>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
