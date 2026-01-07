@@ -311,7 +311,8 @@ justB is a mobile-first marketplace platform that enables:
 ### Contact
 
 **Email**: investors@justb.com
-**Website**: https://justb.vercel.app
+**Website**: https://justb-psi.vercel.app
+**Investor Portal**: https://justb-psi.vercel.app/investors.html
 **Pitch Deck**: Available upon request
 **Financial Model**: Available for qualified investors
 
