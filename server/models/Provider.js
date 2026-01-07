@@ -1,27 +1,5 @@
 const mongoose = require('mongoose');
 
-const menuItemSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  description: String,
-  price: {
-    type: Number,
-    required: true
-  },
-  image: String,
-  category: {
-    type: String,
-    enum: ['traditional', 'continental', 'vegan', 'gluten-free', 'sweet', 'savory'],
-    default: 'traditional'
-  },
-  available: {
-    type: Boolean,
-    default: true
-  }
-});
-
 const providerSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -95,7 +73,6 @@ const providerSchema = new mongoose.Schema({
   images: [{
     type: String
   }],
-  menu: [menuItemSchema],
   operatingHours: {
     monday: { open: String, close: String, closed: Boolean },
     tuesday: { open: String, close: String, closed: Boolean },
