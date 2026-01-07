@@ -135,14 +135,19 @@
   <script src="/js/booking.js"></script>
   <script>
     let currentProvider = null;
+    let menuItems = [];
     let cart = [];
 
     async function loadProvider() {
       try {
         const providerId = window.location.pathname.split('/').pop();
-        const data = await apiRequest(`/providers/${providerId}`);
+        const providerData = await apiRequest(`/providers/${providerId}`);
+        currentProvider = providerData.provider;
 
-        currentProvider = data.provider;
+        // Load menu items separately
+        const menuData = await apiRequest(`/menu-items/provider/${providerId}`);
+        menuItems = menuData.menuItems || [];
+
         displayProvider(currentProvider);
 
       } catch (error) {
@@ -186,7 +191,7 @@
       document.getElementById('providerDescription').textContent = provider.description;
 
       // Menu
-      displayMenu(provider.menu);
+      displayMenu(menuItems);
 
       // Service info
       document.getElementById('serviceInfo').innerHTML = `
@@ -282,7 +287,7 @@
       qtyElement.textContent = newQty;
 
       // Update cart
-      const item = currentProvider.menu.find(m => m._id === itemId);
+      const item = menuItems.find(m => m._id === itemId);
       const cartIndex = cart.findIndex(c => c.menuItemId === itemId);
 
       if (newQty > 0) {

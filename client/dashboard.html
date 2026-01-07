@@ -476,24 +476,33 @@
         await loadProfile();
       }
 
-      if (currentProvider && currentProvider.menu) {
-        displayMenu(currentProvider.menu);
+      if (!currentProvider) {
+        document.getElementById('menuItemsContainer').innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 40px;">Please save your profile first before adding menu items</p>';
+        return;
+      }
+
+      try {
+        const data = await apiRequest(`/menu-items/provider/${currentProvider._id}`);
+        displayMenu(data.menuItems || []);
+      } catch (error) {
+        console.error('Error loading menu:', error);
+        showError('Failed to load menu items');
       }
     }
 
-    function displayMenu(menu) {
+    function displayMenu(menuItems) {
       const container = document.getElementById('menuItemsContainer');
 
-      if (!menu || menu.length === 0) {
+      if (!menuItems || menuItems.length === 0) {
         container.innerHTML = '<p style="color: var(--text-light); text-align: center; padding: 40px;">No menu items yet. Add your first item!</p>';
         return;
       }
 
-      container.innerHTML = menu.map(item => `
+      container.innerHTML = menuItems.map(item => `
         <div class="menu-item">
           <div class="menu-item-info">
             <h4>${item.name}</h4>
-            <p>${item.description}</p>
+            <p>${item.description || 'No description'}</p>
             <span class="badge badge-info">${item.category}</span>
           </div>
           <div style="text-align: right;">
@@ -503,6 +512,14 @@
             <span class="badge ${item.available ? 'badge-success' : 'badge-danger'}">
               ${item.available ? 'Available' : 'Unavailable'}
             </span>
+            <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+              <button class="btn btn-small" onclick="toggleItemAvailability('${item._id}')" title="Toggle availability">
+                ${item.available ? '⏸️' : '▶️'}
+              </button>
+              <button class="btn btn-small" onclick="deleteMenuItem('${item._id}')" title="Delete item">
+                🗑️
+              </button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -541,20 +558,49 @@
           return;
         }
 
-        const updatedMenu = [...(currentProvider.menu || []), newItem];
-
-        const data = await apiRequest(`/providers/${currentProvider._id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ menu: updatedMenu })
+        await apiRequest(`/menu-items/provider/${currentProvider._id}`, {
+          method: 'POST',
+          body: JSON.stringify(newItem)
         });
 
-        currentProvider = data.provider;
-        displayMenu(currentProvider.menu);
         hideAddItemForm();
         showSuccess('Menu item added successfully!');
+        loadMenu();
 
       } catch (error) {
-        showError('Failed to add menu item');
+        showError(error.message || 'Failed to add menu item');
+      }
+    }
+
+    async function toggleItemAvailability(itemId) {
+      try {
+        await apiRequest(`/menu-items/${itemId}/toggle-availability`, {
+          method: 'PATCH'
+        });
+
+        showSuccess('Item availability updated!');
+        loadMenu();
+
+      } catch (error) {
+        showError('Failed to update availability');
+      }
+    }
+
+    async function deleteMenuItem(itemId) {
+      if (!confirm('Are you sure you want to delete this menu item?')) {
+        return;
+      }
+
+      try {
+        await apiRequest(`/menu-items/${itemId}`, {
+          method: 'DELETE'
+        });
+
+        showSuccess('Menu item deleted successfully!');
+        loadMenu();
+
+      } catch (error) {
+        showError('Failed to delete menu item');
       }
     }
 
@@ -582,6 +628,21 @@
     .tab-btn.active {
       color: var(--primary-color);
       border-bottom-color: var(--primary-color);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 16px;
+      background-color: var(--background-light);
+      color: var(--text-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      background-color: var(--border-color);
     }
   </style>
 </body>

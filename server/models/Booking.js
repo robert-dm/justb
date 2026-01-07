@@ -14,6 +14,7 @@ const bookingSchema = new mongoose.Schema({
   items: [{
     menuItemId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: 'MenuItem',
       required: true
     },
     name: {

@@ -46,6 +46,7 @@ app.use(express.static(path.join(__dirname, '../client')));
 // API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/providers', require('./routes/providers'));
+app.use('/api/menu-items', require('./routes/menuItems'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/payments', require('./routes/payments'));
 
