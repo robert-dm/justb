@@ -18,6 +18,9 @@ export const authApi = {
   getMe: () =>
     api.get<{ success: boolean; user: User }>('/auth/me'),
 
+  getProfile: () =>
+    api.get<{ success: boolean; user: User }>('/auth/me'),
+
   updateProfile: (data: UpdateProfileData) =>
     api.put<{ success: boolean; user: User }>('/auth/profile', data),
 };

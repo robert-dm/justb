@@ -173,5 +173,6 @@ export const useCartStore = create<CartStore>()(
 
 // Selector hooks
 export const useCartItems = () => useCartStore((state) => state.items);
-export const useCartItemCount = () => useCartStore((state) => state.getItemCount());
+export const useCartItemCount = () =>
+  useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
 export const useCartProvider = () => useCartStore((state) => state.provider);

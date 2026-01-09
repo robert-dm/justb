@@ -29,8 +29,19 @@ export async function apiClient<T>(
     ...(customHeaders as Record<string, string>),
   };
 
-  // Add auth token if provided or get from localStorage
-  const authToken = token ?? (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
+  // Add auth token if provided or get from localStorage (Zustand persists under 'auth-storage')
+  let authToken = token;
+  if (!authToken && typeof window !== 'undefined') {
+    try {
+      const authStorage = localStorage.getItem('auth-storage');
+      if (authStorage) {
+        const parsed = JSON.parse(authStorage);
+        authToken = parsed?.state?.token;
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
   }

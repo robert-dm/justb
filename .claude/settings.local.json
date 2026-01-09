@@ -32,7 +32,12 @@
       "Bash(hooks:*)",
       "Bash(stores:*)",
       "Bash(types)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "Bash(cat:*)"
     ]
   }
 }

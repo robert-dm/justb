@@ -5,6 +5,18 @@ import { persist } from 'zustand/middleware';
 import { User, LoginCredentials, RegisterData, UpdateProfileData } from '@/types';
 import { authApi } from '@/lib/api';
 
+// Helper to set/remove cookie
+function setTokenCookie(token: string | null) {
+  if (typeof document === 'undefined') return;
+  if (token) {
+    // Set cookie with 7 day expiry
+    document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+  } else {
+    // Remove cookie
+    document.cookie = 'token=; path=/; max-age=0';
+  }
+}
+
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -40,6 +52,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           const response = await authApi.login(credentials);
+          setTokenCookie(response.token);
           set({
             user: response.user,
             token: response.token,
@@ -58,6 +71,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true, error: null });
         try {
           const response = await authApi.register(data);
+          setTokenCookie(response.token);
           set({
             user: response.user,
             token: response.token,
@@ -73,6 +87,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        setTokenCookie(null);
         set({ user: null, token: null, error: null });
         // Also clear from localStorage
         if (typeof window !== 'undefined') {
