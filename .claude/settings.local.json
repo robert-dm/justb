@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(yes:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(npx shadcn@latest add button card input label select badge dialog tabs form toast separator skeleton avatar dropdown-menu textarea -y)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(\"app/\\(public\\)/login\" )",
+      "Bash(\"app/\\(public\\)/register\" )",
+      "Bash(\"app/\\(public\\)/providers/[id]\" )",
+      "Bash(\"app/\\(public\\)/investors/summary\" )",
+      "Bash(\"app/\\(public\\)/investors/financials\" )",
+      "Bash(\"app/\\(public\\)/investors/deck\" )",
+      "Bash(\"app/\\(public\\)/investors/faq\" )",
+      "Bash(\"app/\\(public\\)/investors/market\" )",
+      "Bash(\"app/\\(protected\\)/checkout\" )",
+      "Bash(\"app/\\(protected\\)/bookings\" )",
+      "Bash(\"app/\\(protected\\)/profile\" )",
+      "Bash(\"app/\\(protected\\)/dashboard\" )",
+      "Bash(components/layout )",
+      "Bash(components/auth )",
+      "Bash(components/providers )",
+      "Bash(components/menu )",
+      "Bash(components/cart )",
+      "Bash(components/booking )",
+      "Bash(components/dashboard )",
+      "Bash(components/checkout )",
+      "Bash(components/shared )",
+      "Bash(lib/api )",
+      "Bash(lib/validations )",
+      "Bash(hooks:*)",
+      "Bash(stores:*)",
+      "Bash(types)",
+      "Bash(npm run build:*)"
+    ]
+  }
+}
