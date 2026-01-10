@@ -1,12 +1,17 @@
 import { ApiError } from '@/types';
 
-// Server-side needs absolute URL, client-side uses relative (handled by Next.js rewrites)
+// Server-side needs absolute URL, client-side uses relative
 const getApiUrl = () => {
   if (typeof window === 'undefined') {
     // Server-side: use absolute URL
+    // In Vercel, use VERCEL_URL; locally use localhost
+    if (process.env.VERCEL_URL) {
+      const protocol = process.env.VERCEL_ENV === 'development' ? 'http' : 'https';
+      return `${protocol}://${process.env.VERCEL_URL}/api`;
+    }
     return process.env.API_URL || 'http://localhost:3000/api';
   }
-  // Client-side: use relative URL (Next.js rewrites handle it)
+  // Client-side: use relative URL
   return process.env.NEXT_PUBLIC_API_URL || '/api';
 };
 
