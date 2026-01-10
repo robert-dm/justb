@@ -1,6 +1,14 @@
 import { ApiError } from '@/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// Server-side needs absolute URL, client-side uses relative (handled by Next.js rewrites)
+const getApiUrl = () => {
+  if (typeof window === 'undefined') {
+    // Server-side: use absolute URL
+    return process.env.API_URL || 'http://localhost:3000/api';
+  }
+  // Client-side: use relative URL (Next.js rewrites handle it)
+  return process.env.NEXT_PUBLIC_API_URL || '/api';
+};
 
 export class ApiClientError extends Error {
   constructor(
@@ -56,7 +64,7 @@ export async function apiClient<T>(
   }
 
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, config);
+    const response = await fetch(`${getApiUrl()}${endpoint}`, config);
     const data = await response.json();
 
     if (!response.ok) {
