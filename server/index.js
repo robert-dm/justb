@@ -9,6 +9,46 @@ dotenv.config();
 
 const app = express();
 
+// CORS Configuration - MUST BE FIRST
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      process.env.CLIENT_URL
+    ].filter(Boolean);
+
+    if (allowedOrigins.includes(origin) || process.env.VERCEL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// Body parser (except for webhook route)
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/payments/webhook') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
+
+app.use(express.urlencoded({ extended: true }));
+
 // Middleware to ensure DB connection for serverless
 app.use(async (req, res, next) => {
   try {
@@ -22,23 +62,6 @@ app.use(async (req, res, next) => {
     });
   }
 });
-
-// Middleware
-app.use(cors({
-  origin: process.env.VERCEL ? true : (process.env.CLIENT_URL || 'http://localhost:3000'),
-  credentials: true
-}));
-
-// Body parser (except for webhook route)
-app.use((req, res, next) => {
-  if (req.originalUrl === '/api/payments/webhook') {
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
-
-app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from client directory
 app.use(express.static(path.join(__dirname, '../client')));
