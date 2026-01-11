@@ -1,21 +1,19 @@
 import { ApiError } from '@/types';
 
-// Get API URL - works for both client and server
-const getApiUrl = () => {
-  // Client-side: always use relative URL
+// Get base URL for API calls
+const getBaseUrl = () => {
+  // Client-side: use relative URL
   if (typeof window !== 'undefined') {
-    return '/api';
+    return '';
   }
 
-  // Server-side: need absolute URL
-  // In Vercel production/preview
+  // Server-side in Vercel
   if (process.env.VERCEL_URL) {
-    const protocol = process.env.VERCEL_ENV === 'development' ? 'http' : 'https';
-    return `${protocol}://${process.env.VERCEL_URL}/api`;
+    return `https://${process.env.VERCEL_URL}`;
   }
 
-  // Local development - use same port as Next.js (3002)
-  return 'http://localhost:3002/api';
+  // Local development
+  return 'http://localhost:3002';
 };
 
 export class ApiClientError extends Error {
@@ -72,7 +70,8 @@ export async function apiClient<T>(
   }
 
   try {
-    const response = await fetch(`${getApiUrl()}${endpoint}`, config);
+    const baseUrl = getBaseUrl();
+    const response = await fetch(`${baseUrl}/api${endpoint}`, config);
     const data = await response.json();
 
     if (!response.ok) {

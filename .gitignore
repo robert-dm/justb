@@ -35,3 +35,5 @@ temp/
 # Uploads
 uploads/
 client/images/uploads/
+.vercel
+.env*.local
