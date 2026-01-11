@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUpload } from '@/components/ui/image-upload';
 import {
   Select,
   SelectContent,
@@ -26,7 +27,7 @@ const menuItemSchema = z.object({
   description: z.string().optional(),
   price: z.number().min(0.01, 'Price must be greater than 0'),
   category: z.string().optional(),
-  image: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  image: z.string().optional(),
   preparationTime: z.number().min(1).optional(),
   allergens: z.string().optional(),
 });
@@ -78,6 +79,7 @@ export function AddMenuItemForm({
   });
 
   const selectedCategory = watch('category');
+  const imageValue = watch('image');
 
   const onSubmit = async (data: MenuItemFormData) => {
     setIsSubmitting(true);
@@ -193,15 +195,12 @@ export function AddMenuItemForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image">Image URL</Label>
-            <Input
-              id="image"
-              {...register('image')}
-              placeholder="https://example.com/image.jpg"
+            <Label>Image</Label>
+            <ImageUpload
+              value={imageValue}
+              onChange={(url) => setValue('image', url || '')}
+              disabled={isSubmitting}
             />
-            {errors.image && (
-              <p className="text-sm text-destructive">{errors.image.message}</p>
-            )}
           </div>
 
           <div className="space-y-2">
