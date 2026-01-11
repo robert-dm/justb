@@ -12,12 +12,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { providersApi } from '@/lib/api';
 import { Provider } from '@/types';
 
 const providerSchema = z.object({
   businessName: z.string().min(2, 'Business name is required'),
   description: z.string().optional(),
+  image: z.string().optional(),
   deliveryRadius: z.number().min(1).optional(),
   minimumOrder: z.number().min(0).optional(),
   deliveryFee: z.number().min(0).optional(),
@@ -55,6 +57,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
     defaultValues: {
       businessName: provider.businessName,
       description: provider.description || '',
+      image: provider.images?.[0] || '',
       deliveryRadius: provider.deliveryRadius || 5,
       minimumOrder: provider.minimumOrder || 0,
       deliveryFee: provider.deliveryFee || 0,
@@ -64,6 +67,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
   });
 
   const serviceType = watch('serviceType');
+  const imageValue = watch('image');
 
   const onSubmit = async (data: ProviderFormData) => {
     setIsSaving(true);
@@ -71,11 +75,15 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
       const response = await providersApi.update(provider._id, {
         businessName: data.businessName,
         description: data.description,
+        images: data.image ? [data.image] : [],
         deliveryRadius: data.deliveryRadius,
         minimumOrder: data.minimumOrder,
         deliveryFee: data.deliveryFee,
         serviceType: data.serviceType,
-        address: data.address as Provider['address'],
+        address: {
+          ...data.address,
+          coordinates: provider.address?.coordinates,
+        } as Provider['address'],
       });
       toast.success('Profile updated successfully');
       onUpdate(response.provider);
@@ -118,6 +126,15 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
                 {...register('description')}
                 placeholder="Tell customers about your business..."
                 rows={4}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Business Image</Label>
+              <ImageUpload
+                value={imageValue}
+                onChange={(url) => setValue('image', url || '', { shouldDirty: true })}
+                disabled={isSaving}
               />
             </div>
 
