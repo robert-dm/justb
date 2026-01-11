@@ -1,114 +1,36 @@
-# justB
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A marketplace platform connecting tourists in rental properties with local breakfast providers.
+## Getting Started
 
-## Features
+First, run the development server:
 
-- User accounts for tourists and breakfast providers
-- Location-based search for breakfast services
-- Booking system with delivery scheduling
-- Stripe payment integration
-- Provider dashboards for menu management
-- Reviews and ratings
-
-## Tech Stack
-
-- **Frontend**: HTML, CSS, Vanilla JavaScript
-- **Backend**: Node.js + Express
-- **Database**: MongoDB
-- **Payments**: Stripe
-- **Authentication**: JWT
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- MongoDB (local or MongoDB Atlas account)
-- Stripe account for payment processing
-
-### Installation
-
-1. Clone the repository and install dependencies:
-```bash
-npm install
-```
-
-2. Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-
-3. Update the `.env` file with your actual credentials:
-   - Set your MongoDB connection string
-   - Add your Stripe API keys
-   - Generate a secure JWT secret
-
-4. Start MongoDB (if running locally):
-```bash
-mongod
-```
-
-5. Start the development server:
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-6. Open your browser to `http://localhost:3000`
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Project Structure
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```
-justb/
-├── client/              # Frontend files
-│   ├── css/            # Stylesheets
-│   ├── js/             # JavaScript files
-│   ├── images/         # Images and assets
-│   └── *.html          # HTML pages
-├── server/             # Backend files
-│   ├── models/         # Database models
-│   ├── routes/         # API routes
-│   ├── middleware/     # Express middleware
-│   ├── config/         # Configuration files
-│   └── index.js        # Server entry point
-├── .env               # Environment variables (create from .env.example)
-└── package.json       # Dependencies
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## API Endpoints
+## Learn More
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
+To learn more about Next.js, take a look at the following resources:
 
-### Providers
-- `GET /api/providers` - Get all providers (with search/filter)
-- `GET /api/providers/:id` - Get provider details
-- `POST /api/providers` - Create provider profile (auth required)
-- `PUT /api/providers/:id` - Update provider profile (auth required)
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Bookings
-- `POST /api/bookings` - Create new booking (auth required)
-- `GET /api/bookings/user` - Get user's bookings (auth required)
-- `GET /api/bookings/provider` - Get provider's bookings (auth required)
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Payments
-- `POST /api/payments/create-intent` - Create Stripe payment intent
-- `POST /api/payments/confirm` - Confirm payment
+## Deploy on Vercel
 
-## Development Notes
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- The server serves both API endpoints and static HTML files
-- Frontend uses vanilla JavaScript with fetch API for backend communication
-- MongoDB stores users, providers, listings, and bookings
-- JWT tokens are stored in localStorage for authentication
-- Stripe handles all payment processing
-
-## Next Steps
-
-1. Set up your MongoDB database
-2. Create a Stripe account and get API keys
-3. Customize the branding and styling
-4. Add your breakfast provider listings
-5. Test the booking and payment flow
-6. Deploy to production (Heroku, DigitalOcean, AWS, etc.)
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

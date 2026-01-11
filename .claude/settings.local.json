@@ -37,7 +37,8 @@
       "Bash(ls:*)",
       "Bash(lsof:*)",
       "Bash(curl:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git add:*)"
     ]
   }
 }
