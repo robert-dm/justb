@@ -150,8 +150,106 @@ Required in `.env`:
 - `JWT_SECRET` → Secret key for JWT signing (use strong random value in production)
 - `STRIPE_SECRET_KEY` → Stripe secret key (sk_test_* for dev, sk_live_* for prod)
 - `STRIPE_PUBLISHABLE_KEY` → Stripe publishable key (pk_test_* for dev)
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` → Google Maps browser API key (required for address selection)
+- `GOOGLE_MAPS_API_KEY` → Google Maps server API key (optional, for fallback geocoding)
 - `CLIENT_URL` → Frontend URL for CORS (optional, defaults to localhost:3000)
 - `PORT` → Server port (optional, defaults to 3000)
+
+### Google Maps Integration
+
+The application uses Google Maps for interactive address selection in provider and tourist profiles.
+
+**Setup Instructions:**
+
+1. **Create Google Cloud Project:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com)
+   - Create a new project or select an existing one
+   - Navigate to "APIs & Services" → "Library"
+
+2. **Enable Required APIs:**
+   - Maps JavaScript API (for map display)
+   - Places API (for address autocomplete)
+   - Geocoding API (for coordinate conversion)
+
+3. **Create API Keys:**
+
+   **Browser Key** (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY):
+   - Create an API key
+   - Restrict to HTTP referrers (add your domains)
+   - Allow access to: Maps JavaScript API, Places API
+   - This key is exposed to the browser
+
+   **Server Key** (GOOGLE_MAPS_API_KEY) - Optional:
+   - Create a separate API key
+   - Restrict to Geocoding API only
+   - Used for server-side fallback geocoding
+   - Never expose this key to the browser
+
+4. **Set Up Billing:**
+   - Google provides $200/month free credit
+   - Billing account required even for free tier
+   - Set up budget alerts to monitor usage
+
+5. **Add Keys to Environment:**
+   ```bash
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_browser_key_here
+   GOOGLE_MAPS_API_KEY=your_server_key_here
+   ```
+
+**Usage in Forms:**
+
+- **Provider Creation:** Map-based address selection is required. Users must select their business location on the map or via autocomplete.
+- **Provider Profile Update:** Existing address shown on map. Users can update location by clicking map or searching.
+- **Tourist Profile:** Optional address with map. Helps recommend nearby providers and estimate delivery times.
+
+**Components:**
+
+- `AddressSelector` (`/components/address/address-selector.tsx`) - High-level component combining map and form fields
+- `AddressMapPicker` (`/components/address/address-map-picker.tsx`) - Interactive map with autocomplete and click-to-select
+- `AddressFormFields` (`/components/address/address-form-fields.tsx`) - Standard address input fields
+- `useGoogleMaps` (`/hooks/use-google-maps.ts`) - Hook to load Google Maps API
+
+**Address Selection Methods:**
+
+1. **Autocomplete Search:** Type address → select from suggestions → map updates with marker
+2. **Map Click:** Click on map → reverse geocode → address fields populate
+3. **Marker Drag:** Drag marker → reverse geocode → address fields update
+4. **Manual Entry:** Type in form fields → coordinates can be added via map
+
+**Data Storage:**
+
+Addresses are stored with coordinates in MongoDB:
+```javascript
+address: {
+  street: String,
+  city: String,
+  state: String,
+  zipCode: String,
+  country: String,
+  coordinates: { lat: Number, lng: Number }
+}
+```
+
+**Geospatial Queries:**
+
+Provider documents have a 2dsphere index on `address.coordinates` enabling location-based searches:
+```javascript
+Provider.find({
+  'address.coordinates': {
+    $near: {
+      $geometry: { type: 'Point', coordinates: [lng, lat] },
+      $maxDistance: radiusInMeters
+    }
+  }
+})
+```
+
+**Security Notes:**
+
+- Browser API key (NEXT_PUBLIC_*) is exposed to users - restrict by HTTP referrer
+- Server API key should never be exposed - use only in API routes
+- Monitor API usage in Google Cloud Console
+- Set up billing alerts to prevent unexpected charges
 
 ### Deployment
 
