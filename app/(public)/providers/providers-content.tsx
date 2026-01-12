@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { MapIcon, List } from 'lucide-react';
 import { toast } from 'sonner';
-import { ProviderFilters, ProviderGrid } from '@/components/providers';
+import { ProviderFilters, ProviderGrid, ProvidersMap } from '@/components/providers';
+import { Button } from '@/components/ui/button';
 import { useGeolocation } from '@/hooks';
 import { providersApi } from '@/lib/api';
 import { Provider, ProviderFilters as Filters } from '@/types';
@@ -16,6 +18,7 @@ export function ProvidersContent() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [resultsCount, setResultsCount] = useState(0);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const loadProviders = useCallback(async () => {
     setIsLoading(true);
@@ -81,18 +84,55 @@ export function ProvidersContent() {
 
       {/* Results Section */}
       <section className="container mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-text-dark">
-            {searchParams.has('lat')
-              ? 'Breakfast Providers Near You'
-              : 'All Breakfast Providers'}
-          </h1>
-          <p className="text-text-light">
-            {resultsCount} provider{resultsCount !== 1 ? 's' : ''} found
-          </p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-text-dark">
+              {searchParams.has('lat')
+                ? 'Breakfast Providers Near You'
+                : 'All Breakfast Providers'}
+            </h1>
+            <p className="text-text-light">
+              {resultsCount} provider{resultsCount !== 1 ? 's' : ''} found
+            </p>
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4 mr-2" />
+              List
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setViewMode('map')}
+            >
+              <MapIcon className="h-4 w-4 mr-2" />
+              Map
+            </Button>
+          </div>
         </div>
 
-        <ProviderGrid providers={providers} isLoading={isLoading} />
+        {/* Conditional view rendering */}
+        {viewMode === 'map' ? (
+          <ProvidersMap
+            providers={providers}
+            userLocation={
+              searchParams.has('lat') && searchParams.has('lng')
+                ? {
+                    lat: parseFloat(searchParams.get('lat')!),
+                    lng: parseFloat(searchParams.get('lng')!),
+                  }
+                : undefined
+            }
+          />
+        ) : (
+          <ProviderGrid providers={providers} isLoading={isLoading} />
+        )}
       </section>
     </>
   );
