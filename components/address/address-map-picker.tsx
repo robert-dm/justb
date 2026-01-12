@@ -179,9 +179,13 @@ export function AddressMapPicker({
       coordinates: { lat, lng },
     });
 
-    // Update map and marker
-    updateMarkerPosition(lat, lng, false);
-  }, [autocomplete, disabled, onChange, updateMarkerPosition]);
+    // Update map and marker directly
+    if (marker && map) {
+      const position = { lat, lng };
+      marker.setPosition(position);
+      map.panTo(position);
+    }
+  }, [autocomplete, disabled, onChange, marker, map]);
 
   /**
    * Initialize map
@@ -244,7 +248,7 @@ export function AddressMapPicker({
   }, [isLoaded, map, value.coordinates, defaultCenter, defaultZoom, disabled, handleMapClick, updateMarkerPosition]);
 
   /**
-   * Initialize autocomplete
+   * Initialize autocomplete (once)
    */
   useEffect(() => {
     if (!isLoaded || !searchInputRef.current || autocomplete) return;
@@ -253,10 +257,24 @@ export function AddressMapPicker({
       fields: ['address_components', 'geometry', 'name'],
     });
 
-    newAutocomplete.addListener('place_changed', handlePlaceSelect);
-
     setAutocomplete(newAutocomplete);
-  }, [isLoaded, autocomplete, handlePlaceSelect]);
+  }, [isLoaded, autocomplete]);
+
+  /**
+   * Update autocomplete listener when handlePlaceSelect changes
+   */
+  useEffect(() => {
+    if (!autocomplete) return;
+
+    const listener = autocomplete.addListener('place_changed', handlePlaceSelect);
+
+    // Cleanup listener when handlePlaceSelect changes or on unmount
+    return () => {
+      if (listener) {
+        google.maps.event.removeListener(listener);
+      }
+    };
+  }, [autocomplete, handlePlaceSelect]);
 
   /**
    * Update marker when value changes externally
