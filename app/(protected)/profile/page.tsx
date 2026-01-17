@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { AddressSelector } from '@/components/address';
 import { useAuthStore } from '@/stores';
 
 const profileSchema = z.object({
@@ -24,6 +25,10 @@ const profileSchema = z.object({
     state: z.string().optional(),
     zipCode: z.string().optional(),
     country: z.string().optional(),
+    coordinates: z.object({
+      lat: z.number(),
+      lng: z.number(),
+    }).optional(),
   }).optional(),
 });
 
@@ -38,6 +43,9 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
+    watch,
     reset,
     formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
@@ -175,55 +183,20 @@ export default function ProfilePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="street">Street Address</Label>
-                <Input
-                  id="street"
-                  {...register('address.street')}
-                  placeholder="123 Main St"
-                />
-              </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <p className="text-sm text-muted-foreground">
+                Adding your address helps us recommend nearby providers and estimate delivery times.
+              </p>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    {...register('address.city')}
-                    placeholder="City"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="state">State/Province</Label>
-                  <Input
-                    id="state"
-                    {...register('address.state')}
-                    placeholder="State"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="zipCode">ZIP/Postal Code</Label>
-                  <Input
-                    id="zipCode"
-                    {...register('address.zipCode')}
-                    placeholder="12345"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    {...register('address.country')}
-                    placeholder="Country"
-                  />
-                </div>
-              </div>
+              <AddressSelector
+                control={control}
+                setValue={setValue}
+                watch={watch}
+                register={register}
+                errors={errors.address}
+                namePrefix="address"
+                defaultCenter={user?.address?.coordinates}
+              />
 
               <Button type="submit" disabled={!isDirty || isSaving}>
                 {isSaving ? (

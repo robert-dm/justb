@@ -2,10 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Loader2, Package, UtensilsCrossed, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { OrdersTab, MenuTab, ProfileTab } from '@/components/dashboard';
+import { AddressSelector } from '@/components/address';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { providersApi } from '@/lib/api';
 import { useAuthStore } from '@/stores';
 import { Provider } from '@/types';
@@ -127,66 +135,68 @@ export default function DashboardPage() {
   );
 }
 
-// Geocode address using Nominatim (OpenStreetMap)
-async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
-  try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
-      { headers: { 'User-Agent': 'justB-App' } }
-    );
-    const data = await response.json();
-    if (data && data.length > 0) {
-      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
+// Zod schema for provider creation form
+const providerCreationSchema = z.object({
+  businessName: z.string().min(2, 'Business name is required'),
+  description: z.string().min(10, 'Please provide a description (at least 10 characters)'),
+  address: z.object({
+    street: z.string().min(1, 'Street address is required'),
+    city: z.string().min(1, 'City is required'),
+    state: z.string().optional(),
+    zipCode: z.string().min(1, 'ZIP code is required'),
+    country: z.string().min(1, 'Country is required'),
+    coordinates: z.object({
+      lat: z.number(),
+      lng: z.number(),
+    }),
+  }),
+});
 
-// Simple form to create provider profile
+type ProviderCreationData = z.infer<typeof providerCreationSchema>;
+
+// Form to create provider profile with map-based address selection
 function CreateProviderForm({
   onSuccess,
 }: {
   onSuccess: (provider: Provider) => void;
 }) {
-  const [businessName, setBusinessName] = useState('');
-  const [description, setDescription] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [country, setCountry] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!businessName.trim() || !description.trim() || !street.trim() || !city.trim() || !zipCode.trim() || !country.trim()) {
-      toast.error('Please fill in all required fields');
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<ProviderCreationData>({
+    resolver: zodResolver(providerCreationSchema),
+    defaultValues: {
+      businessName: '',
+      description: '',
+      address: {
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: '',
+      },
+    },
+  });
+
+  const onSubmit = async (data: ProviderCreationData) => {
+    // Validate coordinates are present
+    if (!data.address.coordinates?.lat || !data.address.coordinates?.lng) {
+      toast.error('Please select your location on the map');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Geocode the address
-      const fullAddress = `${street}, ${city}, ${zipCode}, ${country}`;
-      const coordinates = await geocodeAddress(fullAddress);
-
-      if (!coordinates) {
-        toast.error('Could not geocode address. Please check the address and try again.');
-        setIsSubmitting(false);
-        return;
-      }
-
       const response = await providersApi.create({
-        businessName,
-        description,
-        address: {
-          street,
-          city,
-          zipCode,
-          country,
-          coordinates,
-        },
+        businessName: data.businessName,
+        description: data.description,
+        address: data.address,
       });
       toast.success('Profile created! You can now add menu items.');
       onSuccess(response.provider);
@@ -198,99 +208,50 @@ function CreateProviderForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4 max-w-md mx-auto">
-      <div className="space-y-2">
-        <label htmlFor="businessName" className="text-sm font-medium">
-          Business Name *
-        </label>
-        <input
+    <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6 max-w-2xl mx-auto">
+      {/* Business Name */}
+      <div>
+        <Label htmlFor="businessName">Business Name *</Label>
+        <Input
           id="businessName"
-          type="text"
-          value={businessName}
-          onChange={(e) => setBusinessName(e.target.value)}
+          {...register('businessName')}
           placeholder="Your business name"
-          className="w-full rounded-md border px-3 py-2"
-          required
+          className="mt-1.5"
         />
+        {errors.businessName && (
+          <p className="text-sm text-destructive mt-1">{errors.businessName.message}</p>
+        )}
       </div>
-      <div className="space-y-2">
-        <label htmlFor="description" className="text-sm font-medium">
-          Description *
-        </label>
-        <textarea
+
+      {/* Description */}
+      <div>
+        <Label htmlFor="description">Description *</Label>
+        <Textarea
           id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          {...register('description')}
           placeholder="Tell customers about your breakfast offerings..."
-          className="w-full rounded-md border px-3 py-2 min-h-[80px]"
-          required
+          className="mt-1.5 min-h-[80px]"
         />
+        {errors.description && (
+          <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+        )}
       </div>
-      <div className="space-y-2">
-        <label htmlFor="street" className="text-sm font-medium">
-          Street Address *
-        </label>
-        <input
-          id="street"
-          type="text"
-          value={street}
-          onChange={(e) => setStreet(e.target.value)}
-          placeholder="123 Main St"
-          className="w-full rounded-md border px-3 py-2"
-          required
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <label htmlFor="city" className="text-sm font-medium">
-            City *
-          </label>
-          <input
-            id="city"
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-            className="w-full rounded-md border px-3 py-2"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="zipCode" className="text-sm font-medium">
-            ZIP Code *
-          </label>
-          <input
-            id="zipCode"
-            type="text"
-            value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
-            placeholder="12345"
-            className="w-full rounded-md border px-3 py-2"
-            required
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="country" className="text-sm font-medium">
-          Country *
-        </label>
-        <input
-          id="country"
-          type="text"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          placeholder="Country"
-          className="w-full rounded-md border px-3 py-2"
-          required
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-md bg-primary px-4 py-2 text-white hover:bg-primary/90 disabled:opacity-50"
-      >
-        {isSubmitting ? 'Creating...' : 'Create Profile'}
-      </button>
+
+      {/* Address Selector with Map */}
+      <AddressSelector
+        control={control}
+        setValue={setValue}
+        watch={watch}
+        register={register}
+        errors={errors.address}
+        namePrefix="address"
+      />
+
+      {/* Submit Button */}
+      <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
+        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
+      </Button>
     </form>
   );
 }
