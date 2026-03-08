@@ -12,10 +12,10 @@ export const bookingsApi = {
     api.post<BookingResponse>('/bookings', data),
 
   getUserBookings: () =>
-    api.get<BookingsResponse>('/bookings/user'),
+    api.get<BookingsResponse>('/bookings?type=user'),
 
   getProviderBookings: () =>
-    api.get<BookingsResponse>('/bookings/provider'),
+    api.get<BookingsResponse>('/bookings?type=provider'),
 
   getById: (id: string) =>
     api.get<BookingResponse>(`/bookings/${id}`),

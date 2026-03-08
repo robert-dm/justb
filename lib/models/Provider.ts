@@ -34,6 +34,10 @@ export interface IProvider extends Document {
       lat: number;
       lng: number;
     };
+    location?: {
+      type: 'Point';
+      coordinates: [number, number]; // [lng, lat]
+    };
   };
   images: string[];
   operatingHours: {
@@ -126,6 +130,16 @@ const providerSchema = new Schema<IProvider>(
           required: true,
         },
       },
+      location: {
+        type: {
+          type: String,
+          enum: ['Point'],
+          default: 'Point',
+        },
+        coordinates: {
+          type: [Number], // [lng, lat]
+        },
+      },
     },
     images: [
       {
@@ -176,8 +190,36 @@ const providerSchema = new Schema<IProvider>(
   }
 );
 
+// Auto-populate GeoJSON location from lat/lng before save
+providerSchema.pre('save', function () {
+  if (this.address?.coordinates?.lat != null && this.address?.coordinates?.lng != null) {
+    this.address.location = {
+      type: 'Point',
+      coordinates: [this.address.coordinates.lng, this.address.coordinates.lat],
+    };
+  }
+});
+
+// Also handle findOneAndUpdate
+providerSchema.pre('findOneAndUpdate', function () {
+  const update = this.getUpdate() as Record<string, unknown> | null;
+  if (!update) return;
+
+  const lat = (update as any)?.address?.coordinates?.lat
+    ?? (update as any)?.['address.coordinates.lat'];
+  const lng = (update as any)?.address?.coordinates?.lng
+    ?? (update as any)?.['address.coordinates.lng'];
+
+  if (lat != null && lng != null) {
+    this.set('address.location', {
+      type: 'Point',
+      coordinates: [lng, lat],
+    });
+  }
+});
+
 // Index for geospatial queries
-providerSchema.index({ 'address.coordinates': '2dsphere' });
+providerSchema.index({ 'address.location': '2dsphere' });
 
 const Provider: Model<IProvider> =
   mongoose.models.Provider || mongoose.model<IProvider>('Provider', providerSchema);

@@ -52,10 +52,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    provider = await Provider.findByIdAndUpdate(id, body, {
-      new: true,
-      runValidators: true,
-    });
+
+    // Use save() instead of findByIdAndUpdate to trigger pre-save hook
+    // which auto-populates address.location GeoJSON from coordinates
+    Object.assign(provider, body);
+    await provider.save();
+
+    // Reload to get populated data
+    provider = await Provider.findById(id);
 
     return Response.json({
       success: true,

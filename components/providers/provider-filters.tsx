@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useGoogleMaps } from '@/hooks';
+import { toast } from 'sonner';
 
 interface ProviderFiltersProps {
   onUseLocation: () => void;
@@ -26,6 +28,9 @@ export function ProviderFilters({
 }: ProviderFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isLoaded } = useGoogleMaps();
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const updateFilter = useCallback(
     (key: string, value: string | null) => {
@@ -53,17 +58,48 @@ export function ProviderFilters({
     [router, searchParams]
   );
 
+  // Initialize Google Places Autocomplete on the address input
+  useEffect(() => {
+    if (!isLoaded || !addressInputRef.current || autocompleteRef.current) return;
+
+    const autocomplete = new google.maps.places.Autocomplete(
+      addressInputRef.current,
+      { fields: ['geometry', 'formatted_address'] }
+    );
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry?.location) {
+        toast.error('Could not find that location. Please try a different address.');
+        return;
+      }
+
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('lat', lat.toString());
+      params.set('lng', lng.toString());
+      router.push(`/providers?${params.toString()}`);
+      toast.success('Showing providers near ' + (place.formatted_address || 'selected location'));
+    });
+
+    autocompleteRef.current = autocomplete;
+  }, [isLoaded, router, searchParams]);
+
   return (
     <div className="space-y-4 rounded-lg bg-background-light p-6">
       {/* Search and Location */}
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="flex flex-1 gap-2">
-          <Input
-            placeholder="Enter your location..."
-            defaultValue={searchParams.get('location') || ''}
-            onChange={(e) => updateFilter('location', e.target.value || null)}
-            className="bg-white"
-          />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              ref={addressInputRef}
+              placeholder="Enter an address to find nearby providers..."
+              className="bg-white pl-9"
+            />
+          </div>
           <Button
             variant="secondary"
             onClick={onUseLocation}

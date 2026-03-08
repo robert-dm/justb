@@ -3,6 +3,9 @@ import connectDB from '@/lib/db';
 import Provider from '@/lib/models/Provider';
 import { getAuthUser, unauthorizedResponse, errorResponse } from '@/lib/auth';
 
+// Run location backfill only once per server instance
+let locationBackfillDone = false;
+
 // GET all providers with search and filtering
 export async function GET(request: NextRequest) {
   try {
@@ -38,20 +41,71 @@ export async function GET(request: NextRequest) {
       query['rating.average'] = { $gte: parseFloat(minRating) };
     }
 
-    // Geospatial query for nearby providers
-    if (lat && lng) {
-      const radiusInKm = radius ? parseFloat(radius) : 10;
-      const radiusInMeters = radiusInKm * 1000;
+    // Backfill GeoJSON location for old providers (runs once per server instance)
+    if (!locationBackfillDone) {
+      const providersToBackfill = await Provider.find({
+        'address.coordinates.lat': { $exists: true },
+        'address.location.coordinates': { $exists: false },
+      });
 
-      query['address.coordinates'] = {
-        $near: {
-          $geometry: {
+      for (const p of providersToBackfill) {
+        if (p.address?.coordinates?.lat != null && p.address?.coordinates?.lng != null) {
+          p.address.location = {
             type: 'Point',
-            coordinates: [parseFloat(lng), parseFloat(lat)],
+            coordinates: [p.address.coordinates.lng, p.address.coordinates.lat],
+          };
+          await p.save();
+        }
+      }
+
+      locationBackfillDone = true;
+    }
+
+    // Geospatial query: use aggregation to compare distance against each provider's deliveryRadius
+    if (lat && lng) {
+      const maxSearchRadiusMeters = (radius ? parseFloat(radius) : 50) * 1000;
+
+      const pipeline: any[] = [
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [parseFloat(lng), parseFloat(lat)],
+            },
+            distanceField: 'distance', // in meters
+            maxDistance: maxSearchRadiusMeters,
+            spherical: true,
+            key: 'address.location',
+            query,
           },
-          $maxDistance: radiusInMeters,
         },
-      };
+        // Keep only providers whose delivery radius reaches the user
+        {
+          $match: {
+            $expr: {
+              $lte: [
+                '$distance',
+                { $multiply: [{ $ifNull: ['$deliveryRadius', 5] }, 1000] },
+              ],
+            },
+          },
+        },
+        { $sort: { 'rating.average': -1 } },
+      ];
+
+      const results = await Provider.aggregate(pipeline);
+
+      // Populate userId after aggregation
+      const populated = await Provider.populate(results, {
+        path: 'userId',
+        select: 'name email phone',
+      });
+
+      return Response.json({
+        success: true,
+        count: populated.length,
+        providers: populated,
+      });
     }
 
     const providers = await Provider.find(query)

@@ -14,6 +14,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { AddressSelector } from '@/components/address';
 import { useAuthStore } from '@/stores';
+import { providersApi } from '@/lib/api';
+import { Address } from '@/types';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -39,6 +41,7 @@ export default function ProfilePage() {
   const { user, refreshUser, updateProfile: storeUpdateProfile, logout } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [providerAddress, setProviderAddress] = useState<Address | undefined>();
 
   const {
     register,
@@ -66,17 +69,35 @@ export default function ProfilePage() {
     fetchProfile();
   }, [refreshUser]);
 
-  // Set form values when user is loaded
+  // For providers, fetch provider profile to get the address if user has none
+  useEffect(() => {
+    async function fetchProviderAddress() {
+      if (user?.role !== 'provider' || user?.address?.coordinates) return;
+      try {
+        const response = await providersApi.getMyProfile();
+        if (response.provider?.address) {
+          setProviderAddress(response.provider.address);
+        }
+      } catch {
+        // Provider profile may not exist yet
+      }
+    }
+
+    fetchProviderAddress();
+  }, [user]);
+
+  // Set form values when user is loaded (use provider address as fallback)
   useEffect(() => {
     if (user) {
+      const address = user.address?.coordinates ? user.address : (providerAddress || user.address || {});
       reset({
         name: user.name,
         email: user.email,
         phone: user.phone || '',
-        address: user.address || {},
+        address,
       });
     }
-  }, [user, reset]);
+  }, [user, providerAddress, reset]);
 
   const onSubmit = async (data: ProfileFormData) => {
     setIsSaving(true);
@@ -195,7 +216,7 @@ export default function ProfilePage() {
                 register={register}
                 errors={errors.address}
                 namePrefix="address"
-                defaultCenter={user?.address?.coordinates}
+                defaultCenter={user?.address?.coordinates || providerAddress?.coordinates}
               />
 
               <Button type="submit" disabled={!isDirty || isSaving}>
