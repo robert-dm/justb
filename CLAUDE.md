@@ -20,6 +20,13 @@ npm run dev                   # Development mode with auto-reload (uses nodemon)
 npm start                     # Production mode
 ```
 
+### Testing
+```bash
+npm test                      # Run all tests once
+npm run test:watch            # Run in watch mode (re-runs on file changes)
+npx vitest run tests/cart-store.test.ts   # Run a specific test file
+```
+
 ### Database
 - **Local MongoDB**: Ensure MongoDB is running (`brew services start mongodb-community` on Mac, `sudo systemctl start mongod` on Linux)
 - **MongoDB Atlas**: Use connection string in `.env` MONGODB_URI
@@ -309,13 +316,33 @@ Provider.find({
 })
 ```
 
-### Testing Locally
+### Automated Tests
+The project uses [Vitest](https://vitest.dev/) with jsdom environment. Config is in `vitest.config.ts`.
+
+**Test files** are in `tests/`:
+- `cart-store.test.ts` — Cart store unit tests (add/remove, provider switching, pricing, delivery fees)
+- `booking-api.test.ts` — API route tests (booking CRUD, bulk bookings, payment simulation, status workflow, reviews, authorization)
+
+**Patterns:**
+- API route tests mock `@/lib/db`, `@/lib/auth`, `@/lib/models/Booking`, and `@/lib/models/Provider`
+- Use `NextRequest` to construct requests and call route handlers directly
+- `makeBookingDoc()` helper creates mock Mongoose documents with `.save()` stub
+- Cart store tests call `useCartStore.getState()` directly (no React rendering needed)
+
+**Running:**
+```bash
+npm test                                    # Run all tests once
+npm run test:watch                          # Watch mode
+npx vitest run tests/cart-store.test.ts     # Single file
+```
+
+### Manual Testing
 1. Start MongoDB locally
 2. Set up `.env` with test Stripe keys and local MongoDB URI
 3. Run `npm run dev`
 4. Register test accounts (tourist and provider)
 5. Set up provider profile with menu items
-6. Test booking flow with Stripe test cards
+6. Test booking flow with simulated payment (auto-filled test card)
 
 ## Code Organization Principles
 

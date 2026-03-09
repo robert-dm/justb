@@ -64,7 +64,7 @@ export const useCartStore = create<CartStore>()(
 
       // Actions
       addItem: (item) => {
-        const { items, providerId, provider } = get();
+        const { providerId } = get();
 
         // If cart has items from a different provider, clear it
         if (providerId && providerId !== item.providerId) {
@@ -76,6 +76,8 @@ export const useCartStore = create<CartStore>()(
           });
         }
 
+        // Re-read items after potential clear
+        const { items } = get();
         const existingItem = items.find((i) => i.menuItemId === item._id);
 
         if (existingItem) {
