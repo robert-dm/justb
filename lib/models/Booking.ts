@@ -43,6 +43,7 @@ export interface IBooking extends Document {
   };
   status: 'pending' | 'confirmed' | 'preparing' | 'on-the-way' | 'delivered' | 'completed' | 'cancelled';
   specialInstructions?: string;
+  groupId?: string;
   recurring?: {
     enabled: boolean;
     frequency: 'daily' | 'weekdays' | 'weekends';
@@ -154,6 +155,7 @@ const bookingSchema = new Schema<IBooking>(
       default: 'pending',
     },
     specialInstructions: String,
+    groupId: String,
     recurring: {
       enabled: {
         type: Boolean,
@@ -185,6 +187,7 @@ const bookingSchema = new Schema<IBooking>(
 bookingSchema.index({ userId: 1, createdAt: -1 });
 bookingSchema.index({ providerId: 1, deliveryDate: 1 });
 bookingSchema.index({ status: 1 });
+bookingSchema.index({ groupId: 1 });
 
 const Booking: Model<IBooking> =
   mongoose.models.Booking || mongoose.model<IBooking>('Booking', bookingSchema);

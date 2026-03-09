@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuthStore, useCartItemCount } from '@/stores';
+import { useAuthStore } from '@/stores';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,11 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ShoppingBag, User, LogOut, LayoutDashboard, ClipboardList } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, ClipboardList } from 'lucide-react';
+import { CartSheet } from '@/components/cart';
 
 export function Header() {
   const { user, token, logout } = useAuthStore();
-  const cartItemCount = useCartItemCount();
   const isAuthenticated = !!token;
   const isProvider = user?.role === 'provider';
 
@@ -60,16 +60,9 @@ export function Header() {
                 </li>
               )}
 
-              {/* Cart Icon */}
+              {/* Cart */}
               <li>
-                <Link href="/checkout" className="relative">
-                  <ShoppingBag className="h-6 w-6 text-text-dark transition-colors hover:text-primary" />
-                  {cartItemCount > 0 && (
-                    <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                      {cartItemCount}
-                    </span>
-                  )}
-                </Link>
+                <CartSheet />
               </li>
 
               {/* User Menu */}

@@ -13,22 +13,36 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('booking');
+  const groupId = searchParams.get('group');
 
-  const [booking, setBooking] = useState<Booking | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchBooking() {
-      if (!bookingId) {
+    async function fetchBookings() {
+      if (!bookingId && !groupId) {
         setError('No booking ID provided');
         setIsLoading(false);
         return;
       }
 
       try {
-        const response = await bookingsApi.getById(bookingId);
-        setBooking(response.booking);
+        if (groupId) {
+          // Fetch all bookings in the group via user bookings and filter
+          const response = await bookingsApi.getUserBookings();
+          const groupBookings = response.bookings
+            .filter((b: Booking) => b.groupId === groupId)
+            .sort((a: Booking, b: Booking) => a.deliveryDate.localeCompare(b.deliveryDate));
+          if (groupBookings.length === 0) {
+            setError('No bookings found for this group');
+          } else {
+            setBookings(groupBookings);
+          }
+        } else if (bookingId) {
+          const response = await bookingsApi.getById(bookingId);
+          setBookings([response.booking]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load booking');
       } finally {
@@ -36,8 +50,8 @@ export default function CheckoutPage() {
       }
     }
 
-    fetchBooking();
-  }, [bookingId]);
+    fetchBookings();
+  }, [bookingId, groupId]);
 
   if (isLoading) {
     return (
@@ -50,7 +64,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (error || !booking) {
+  if (error || bookings.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-md text-center">
@@ -64,32 +78,48 @@ export default function CheckoutPage() {
     );
   }
 
-  // If payment is already completed, redirect to bookings
-  if (booking.payment.status === 'completed') {
+  // If all bookings are already paid, redirect
+  const allPaid = bookings.every((b) => b.payment?.status === 'completed');
+  if (allPaid) {
     router.push('/bookings');
     return null;
   }
 
+  const firstBooking = bookings[0];
+  const isMultiDay = bookings.length > 1;
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <Link href={`/providers/${booking.providerId._id}`}>
+      <Link href="/providers">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Provider
+          Back to Providers
         </Button>
       </Link>
 
-      <h1 className="mb-8 text-2xl font-bold">Checkout</h1>
+      <h1 className="mb-8 text-2xl font-bold">
+        {isMultiDay ? `Checkout — ${bookings.length} Days` : 'Checkout'}
+      </h1>
 
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Order Summary */}
-        <div>
-          <OrderSummary booking={booking} />
+        <div className="space-y-4">
+          {isMultiDay ? (
+            bookings.map((b) => (
+              <OrderSummary key={b._id} booking={b} compact={isMultiDay} />
+            ))
+          ) : (
+            <OrderSummary booking={firstBooking} />
+          )}
         </div>
 
-        {/* Payment Form */}
+        {/* Payment */}
         <div>
-          <PaymentForm booking={booking} />
+          <PaymentForm
+            booking={isMultiDay ? undefined : firstBooking}
+            bookings={isMultiDay ? bookings : undefined}
+            groupId={groupId || undefined}
+          />
         </div>
       </div>
     </div>

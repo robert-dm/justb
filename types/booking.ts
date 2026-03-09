@@ -71,6 +71,7 @@ export interface Booking {
   payment: PaymentInfo;
   status: BookingStatus;
   specialInstructions?: string;
+  groupId?: string;
   recurring?: RecurringSettings;
   review?: Review;
   createdAt: string;
@@ -79,14 +80,36 @@ export interface Booking {
 
 export interface CreateBookingData {
   providerId: string;
-  items: Omit<BookingItem, 'name' | 'price'>[];
+  items: BookingItem[];
   deliveryDate: string;
   deliveryTime: string;
   deliveryType: DeliveryType;
   deliveryAddress?: DeliveryAddress;
   pricing: Pricing;
   specialInstructions?: string;
+  groupId?: string;
   recurring?: RecurringSettings;
+}
+
+export interface DeliveryDay {
+  date: string;
+  time: string;
+}
+
+export interface CreateBulkBookingData {
+  providerId: string;
+  items: BookingItem[];
+  days: DeliveryDay[];
+  deliveryType: DeliveryType;
+  deliveryAddress?: DeliveryAddress;
+  pricing: Pricing;
+  specialInstructions?: string;
+}
+
+export interface BulkBookingResponse {
+  success: boolean;
+  bookings: Booking[];
+  groupId: string;
 }
 
 export interface AddReviewData {

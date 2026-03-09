@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, UtensilsCrossed, Truck } from 'lucide-react';
+import { HeroSearch } from '@/components/home/hero-search';
 
 export default function HomePage() {
   return (
@@ -17,17 +18,7 @@ export default function HomePage() {
             delivered to your rental
           </p>
 
-          {/* Search Bar */}
-          <div className="mx-auto flex max-w-2xl gap-2 rounded-full bg-white p-2 shadow-lg">
-            <input
-              type="text"
-              placeholder="Where are you staying?"
-              className="flex-1 rounded-full px-6 py-3 text-base outline-none placeholder:text-text-light"
-            />
-            <Button size="lg" className="rounded-full px-8">
-              Search
-            </Button>
-          </div>
+          <HeroSearch />
         </div>
       </section>
 

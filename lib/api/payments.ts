@@ -1,5 +1,11 @@
 import { api } from './client';
-import { PaymentIntentResponse, PaymentConfirmResponse } from '@/types';
+import { PaymentIntentResponse, PaymentConfirmResponse, Booking } from '@/types';
+
+interface SimulatePaymentResponse {
+  success: boolean;
+  message: string;
+  bookings: Booking[];
+}
 
 export const paymentsApi = {
   createIntent: (bookingId: string, amount: number) =>
@@ -13,4 +19,7 @@ export const paymentsApi = {
       paymentIntentId,
       bookingId,
     }),
+
+  simulate: (params: { bookingId?: string; groupId?: string }) =>
+    api.post<SimulatePaymentResponse>('/payments/simulate', params),
 };

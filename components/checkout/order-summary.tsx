@@ -9,10 +9,55 @@ import { formatCurrency } from '@/lib/utils/format';
 
 interface OrderSummaryProps {
   booking: Booking;
+  compact?: boolean;
 }
 
-export function OrderSummary({ booking }: OrderSummaryProps) {
+export function OrderSummary({ booking, compact }: OrderSummaryProps) {
   const provider = booking.providerId;
+
+  if (compact) {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {provider.images?.[0] ? (
+                <img
+                  src={provider.images[0]}
+                  alt={provider.businessName}
+                  className="h-8 w-8 rounded object-cover"
+                />
+              ) : (
+                <div className="h-8 w-8 rounded bg-muted flex items-center justify-center">
+                  <Store className="h-4 w-4 text-muted-foreground" />
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-medium">{provider.businessName}</p>
+                <div className="flex items-center gap-2 text-xs text-text-light">
+                  <Clock className="h-3 w-3" />
+                  <span>
+                    {new Date(booking.deliveryDate).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}{' '}
+                    at {booking.deliveryTime}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-semibold">{formatCurrency(booking.pricing.total)}</p>
+              <p className="text-xs text-text-light">
+                {booking.items.length} item{booking.items.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

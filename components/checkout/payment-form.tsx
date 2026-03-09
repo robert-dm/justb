@@ -1,178 +1,114 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { Loader2, CreditCard, CheckCircle } from 'lucide-react';
+import { Loader2, CreditCard, CheckCircle, Lock, CalendarDays } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { paymentsApi } from '@/lib/api';
 import { Booking } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
 import { useCartStore } from '@/stores';
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
-
 interface PaymentFormProps {
-  booking: Booking;
+  booking?: Booking;
+  bookings?: Booking[];
+  groupId?: string;
 }
 
-function CheckoutForm({ booking }: PaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
+export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
   const router = useRouter();
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
+  // Form state (visual only)
+  const [cardNumber, setCardNumber] = useState('4242 4242 4242 4242');
+  const [expiry, setExpiry] = useState('12/34');
+  const [cvc, setCvc] = useState('123');
+  const [cardName, setCardName] = useState('Test User');
+
+  const allBookings = bookings || (booking ? [booking] : []);
+  const totalAmount = allBookings.reduce((sum, b) => sum + b.pricing.total, 0);
+  const isMultiDay = allBookings.length > 1;
+
+  const formatCardNumber = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 16);
+    return digits.replace(/(\d{4})(?=\d)/g, '$1 ');
+  };
+
+  const formatExpiry = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length > 2) {
+      return digits.slice(0, 2) + '/' + digits.slice(2);
+    }
+    return digits;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!stripe || !elements) {
+    // Basic visual validation
+    const cleanCard = cardNumber.replace(/\s/g, '');
+    if (cleanCard.length < 16) {
+      toast.error('Please enter a valid card number');
+      return;
+    }
+    if (expiry.length < 5) {
+      toast.error('Please enter a valid expiry date');
+      return;
+    }
+    if (cvc.length < 3) {
+      toast.error('Please enter a valid CVC');
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/bookings`,
-        },
-        redirect: 'if_required',
-      });
+      // Simulate a short processing delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      if (error) {
-        toast.error(error.message || 'Payment failed');
-        setIsProcessing(false);
-        return;
-      }
+      await paymentsApi.simulate(
+        groupId
+          ? { groupId }
+          : { bookingId: allBookings[0]._id }
+      );
 
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Confirm payment on backend
-        await paymentsApi.confirm(paymentIntent.id, booking._id);
+      setIsComplete(true);
+      clearCart();
+      toast.success('Payment successful!');
 
-        setIsComplete(true);
-        clearCart();
-        toast.success('Payment successful!');
-
-        // Redirect to bookings after short delay
-        setTimeout(() => {
-          router.push('/bookings');
-        }, 2000);
-      }
+      setTimeout(() => {
+        router.push('/bookings');
+      }, 2000);
     } catch (error) {
-      toast.error('Something went wrong with the payment');
+      toast.error(error instanceof Error ? error.message : 'Payment failed');
       setIsProcessing(false);
     }
   };
 
   if (isComplete) {
     return (
-      <div className="py-12 text-center">
-        <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-        <h3 className="mt-4 text-xl font-semibold">Payment Successful!</h3>
-        <p className="mt-2 text-text-light">
-          Redirecting to your bookings...
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      <Button
-        type="submit"
-        className="w-full"
-        size="lg"
-        disabled={!stripe || isProcessing}
-      >
-        {isProcessing ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Processing...
-          </>
-        ) : (
-          <>
-            <CreditCard className="mr-2 h-4 w-4" />
-            Pay {formatCurrency(booking.pricing.total)}
-          </>
-        )}
-      </Button>
-    </form>
-  );
-}
-
-export function PaymentForm({ booking }: PaymentFormProps) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function createPaymentIntent() {
-      try {
-        const response = await paymentsApi.createIntent(
-          booking._id,
-          Math.round(booking.pricing.total * 100) // Amount in cents
-        );
-        setClientSecret(response.clientSecret);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to initialize payment');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    createPaymentIntent();
-  }, [booking._id, booking.pricing.total]);
-
-  if (isLoading) {
-    return (
       <Card>
         <CardContent className="py-12 text-center">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Initializing payment...</p>
+          <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
+          <h3 className="mt-4 text-xl font-semibold">Payment Successful!</h3>
+          <p className="mt-2 text-text-light">
+            {isMultiDay
+              ? `${allBookings.length} orders confirmed.`
+              : 'Your order has been confirmed.'}{' '}
+            Redirecting...
+          </p>
         </CardContent>
       </Card>
     );
   }
-
-  if (error || !clientSecret) {
-    return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-destructive">{error || 'Failed to load payment form'}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const options: StripeElementsOptions = {
-    clientSecret,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#FF5A5F',
-        colorBackground: '#ffffff',
-        colorText: '#484848',
-        colorDanger: '#df1b41',
-        fontFamily: 'system-ui, sans-serif',
-        spacingUnit: '4px',
-        borderRadius: '8px',
-      },
-    },
-  };
 
   return (
     <Card>
@@ -181,11 +117,121 @@ export function PaymentForm({ booking }: PaymentFormProps) {
           <CreditCard className="h-5 w-5" />
           Payment Details
         </CardTitle>
+        <div className="flex items-center gap-1 text-xs text-text-light">
+          <Lock className="h-3 w-3" />
+          Simulated payment — no real charges
+        </div>
       </CardHeader>
       <CardContent>
-        <Elements stripe={stripePromise} options={options}>
-          <CheckoutForm booking={booking} />
-        </Elements>
+        {/* Multi-day summary */}
+        {isMultiDay && (
+          <div className="mb-6 rounded-lg border bg-muted/30 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">
+                {allBookings.length} delivery days
+              </span>
+            </div>
+            <div className="space-y-1">
+              {allBookings.map((b) => (
+                <div key={b._id} className="flex justify-between text-xs text-text-light">
+                  <span>
+                    {new Date(b.deliveryDate).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}{' '}
+                    at {b.deliveryTime}
+                  </span>
+                  <span>{formatCurrency(b.pricing.total)}</span>
+                </div>
+              ))}
+            </div>
+            <Separator />
+            <div className="flex justify-between text-sm font-semibold">
+              <span>Total</span>
+              <span>{formatCurrency(totalAmount)}</span>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Card number */}
+          <div>
+            <Label htmlFor="card-number">Card Number</Label>
+            <div className="relative mt-1">
+              <Input
+                id="card-number"
+                placeholder="4242 4242 4242 4242"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                className="pl-10"
+              />
+              <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+
+          {/* Name */}
+          <div>
+            <Label htmlFor="card-name">Name on Card</Label>
+            <Input
+              id="card-name"
+              placeholder="John Doe"
+              value={cardName}
+              onChange={(e) => setCardName(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+
+          {/* Expiry + CVC */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="expiry">Expiry</Label>
+              <Input
+                id="expiry"
+                placeholder="12/34"
+                value={expiry}
+                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cvc">CVC</Label>
+              <Input
+                id="cvc"
+                placeholder="123"
+                value={cvc}
+                onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          {/* Test card hint */}
+          <div className="rounded-md bg-blue-50 p-3 text-xs text-blue-700">
+            <p className="font-medium">Test mode</p>
+            <p>Use any card number (e.g. 4242 4242 4242 4242), any future expiry, and any CVC.</p>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing payment...
+              </>
+            ) : (
+              <>
+                <Lock className="mr-2 h-4 w-4" />
+                Pay {formatCurrency(totalAmount)}
+              </>
+            )}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

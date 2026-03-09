@@ -19,11 +19,21 @@ interface DeliveryInfo {
   address?: DeliveryAddress;
 }
 
+export interface SearchAddress {
+  street: string;
+  lat: number;
+  lng: number;
+  apt?: string;
+  floor?: string;
+  notes?: string;
+}
+
 interface CartState {
   items: CartItem[];
   providerId: string | null;
   provider: Provider | null;
   deliveryInfo: DeliveryInfo | null;
+  searchAddress: SearchAddress | null;
 }
 
 interface CartActions {
@@ -32,6 +42,7 @@ interface CartActions {
   updateQuantity: (menuItemId: string, quantity: number) => void;
   setProvider: (provider: Provider) => void;
   setDeliveryInfo: (info: DeliveryInfo) => void;
+  setSearchAddress: (address: SearchAddress) => void;
   clearCart: () => void;
   getSubtotal: () => number;
   getDeliveryFee: () => number;
@@ -49,6 +60,7 @@ export const useCartStore = create<CartStore>()(
       providerId: null,
       provider: null,
       deliveryInfo: null,
+      searchAddress: null,
 
       // Actions
       addItem: (item) => {
@@ -130,6 +142,10 @@ export const useCartStore = create<CartStore>()(
         set({ deliveryInfo: info });
       },
 
+      setSearchAddress: (address) => {
+        set({ searchAddress: address });
+      },
+
       clearCart: () => {
         set({
           items: [],
@@ -166,6 +182,7 @@ export const useCartStore = create<CartStore>()(
         providerId: state.providerId,
         provider: state.provider,
         deliveryInfo: state.deliveryInfo,
+        searchAddress: state.searchAddress,
       }),
     }
   )

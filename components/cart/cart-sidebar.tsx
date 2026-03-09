@@ -96,6 +96,8 @@ export function CartSidebar() {
         providerId: provider!._id,
         items: items.map((item) => ({
           menuItemId: item.menuItemId,
+          name: item.name,
+          price: item.price,
           quantity: item.quantity,
         })),
         deliveryDate,

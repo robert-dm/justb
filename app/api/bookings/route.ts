@@ -24,7 +24,11 @@ export async function GET(request: NextRequest) {
         return errorResponse('Provider profile not found', 404);
       }
 
-      const bookings = await Booking.find({ providerId: provider._id })
+      // Only show bookings that have been paid (not pending payment)
+      const bookings = await Booking.find({
+        providerId: provider._id,
+        'payment.status': 'completed',
+      })
         .populate('userId', 'name email phone address')
         .sort('-deliveryDate');
 

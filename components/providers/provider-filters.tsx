@@ -15,6 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useGoogleMaps } from '@/hooks';
+import { useCartStore } from '@/stores';
 import { toast } from 'sonner';
 
 interface ProviderFiltersProps {
@@ -29,6 +30,7 @@ export function ProviderFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoaded } = useGoogleMaps();
+  const setSearchAddress = useCartStore((s) => s.setSearchAddress);
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
@@ -76,12 +78,15 @@ export function ProviderFilters({
 
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
+      const street = place.formatted_address || 'Selected location';
+
+      setSearchAddress({ street, lat, lng });
 
       const params = new URLSearchParams(searchParams.toString());
       params.set('lat', lat.toString());
       params.set('lng', lng.toString());
       router.push(`/providers?${params.toString()}`);
-      toast.success('Showing providers near ' + (place.formatted_address || 'selected location'));
+      toast.success('Showing providers near ' + street);
     });
 
     autocompleteRef.current = autocomplete;

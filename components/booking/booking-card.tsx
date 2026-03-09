@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Clock, Store, Truck, Star, X, Loader2 } from 'lucide-react';
+import { MapPin, Clock, Store, Truck, Star, X, Loader2, CreditCard } from 'lucide-react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { StatusBadge } from './status-badge';
 import { ReviewDialog } from './review-dialog';
@@ -15,13 +17,15 @@ import { formatCurrency } from '@/lib/utils/format';
 interface BookingCardProps {
   booking: Booking;
   onUpdate?: (booking: Booking) => void;
+  groupDayCount?: number;
 }
 
-export function BookingCard({ booking, onUpdate }: BookingCardProps) {
+export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardProps) {
   const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const provider = booking.providerId;
 
+  const needsPayment = booking.payment?.status !== 'completed' && booking.status === 'pending';
   const canCancel = ['pending', 'confirmed'].includes(booking.status);
   const canReview = booking.status === 'completed' && !booking.review;
 
@@ -152,6 +156,37 @@ export function BookingCard({ booking, onUpdate }: BookingCardProps) {
                     &quot;{booking.review.comment}&quot;
                   </p>
                 )}
+              </div>
+            </>
+          )}
+
+          {/* Payment required banner */}
+          {needsPayment && (
+            <>
+              <Separator className="my-4" />
+              <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Payment pending</p>
+                    <p className="text-xs text-amber-600">Complete payment to confirm your order</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href={`/checkout?booking=${booking._id}`}>
+                      <CreditCard className="mr-1 h-4 w-4" />
+                      Pay this day — {formatCurrency(booking.pricing.total)}
+                    </Link>
+                  </Button>
+                  {booking.groupId && groupDayCount && groupDayCount > 1 && (
+                    <Button size="sm" asChild>
+                      <Link href={`/checkout?group=${booking.groupId}`}>
+                        <CreditCard className="mr-1 h-4 w-4" />
+                        Pay all {groupDayCount} days
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </div>
             </>
           )}

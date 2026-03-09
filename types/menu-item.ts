@@ -44,6 +44,8 @@ export interface MenuItemFilters {
   minPrice?: number;
   maxPrice?: number;
   available?: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 export interface CreateMenuItemData {

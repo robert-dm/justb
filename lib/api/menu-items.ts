@@ -15,6 +15,8 @@ export const menuItemsApi = {
     if (filters?.category) params.append('category', filters.category);
     if (filters?.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
     if (filters?.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+    if (filters?.lat !== undefined) params.append('lat', String(filters.lat));
+    if (filters?.lng !== undefined) params.append('lng', String(filters.lng));
 
     const queryString = params.toString();
     return api.get<MenuItemsResponse>(`/menu-items/all${queryString ? `?${queryString}` : ''}`);
