@@ -29,11 +29,10 @@ export default function CheckoutPage() {
 
       try {
         if (groupId) {
-          // Fetch all bookings in the group via user bookings and filter
-          const response = await bookingsApi.getUserBookings();
-          const groupBookings = response.bookings
-            .filter((b: Booking) => b.groupId === groupId)
-            .sort((a: Booking, b: Booking) => a.deliveryDate.localeCompare(b.deliveryDate));
+          const response = await bookingsApi.getByGroup(groupId);
+          const groupBookings = response.bookings.sort(
+            (a: Booking, b: Booking) => a.deliveryDate.localeCompare(b.deliveryDate)
+          );
           if (groupBookings.length === 0) {
             setError('No bookings found for this group');
           } else {

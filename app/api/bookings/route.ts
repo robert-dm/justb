@@ -39,10 +39,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Default: get user's bookings
-    const bookings = await Booking.find({ userId: user._id })
+    // Filter by groupId if provided
+    const groupId = searchParams.get('groupId');
+    const query: Record<string, unknown> = { userId: user._id };
+    if (groupId) {
+      query.groupId = groupId;
+    }
+
+    const bookings = await Booking.find(query)
       .populate('providerId', 'businessName images address')
-      .sort('-createdAt');
+      .sort(groupId ? 'deliveryDate' : '-createdAt');
 
     return Response.json({
       success: true,

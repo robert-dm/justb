@@ -19,6 +19,9 @@ export const bookingsApi = {
   getUserBookings: () =>
     api.get<BookingsResponse>('/bookings?type=user'),
 
+  getByGroup: (groupId: string) =>
+    api.get<BookingsResponse>(`/bookings?groupId=${groupId}`),
+
   getProviderBookings: () =>
     api.get<BookingsResponse>('/bookings?type=provider'),
 
