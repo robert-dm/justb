@@ -1,6 +1,9 @@
+'use client';
+
 import { Provider } from '@/types';
 import { ProviderCard } from './provider-card';
 import { SearchX } from 'lucide-react';
+import { useTranslation } from '@/hooks';
 
 interface ProviderGridProps {
   providers: Provider[];
@@ -8,6 +11,8 @@ interface ProviderGridProps {
 }
 
 export function ProviderGrid({ providers, isLoading }: ProviderGridProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -25,9 +30,9 @@ export function ProviderGrid({ providers, isLoading }: ProviderGridProps) {
     return (
       <div className="py-16 text-center">
         <SearchX className="mx-auto h-16 w-16 text-muted-foreground" />
-        <h3 className="mt-4 text-xl font-semibold">No providers found</h3>
+        <h3 className="mt-4 text-xl font-semibold">{t('providers', 'noProviders')}</h3>
         <p className="mt-2 text-text-light">
-          Try adjusting your search or filters
+          {t('providers', 'tryAdjustingSearch')}
         </p>
       </div>
     );

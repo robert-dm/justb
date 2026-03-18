@@ -10,13 +10,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { BookingCard } from '@/components/booking';
 import { bookingsApi } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 import { Booking, BookingStatus } from '@/types';
 
 function formatDateKey(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-function formatDateHeading(dateStr: string): string {
+function formatDateHeading(dateStr: string, t: (section: 'common', key: 'today' | 'tomorrow') => string): string {
   const date = new Date(dateStr + 'T00:00:00');
   const today = formatDateKey(new Date());
   const tomorrow = new Date();
@@ -24,8 +25,8 @@ function formatDateHeading(dateStr: string): string {
   const tomorrowKey = formatDateKey(tomorrow);
 
   let label = '';
-  if (dateStr === today) label = 'Today — ';
-  else if (dateStr === tomorrowKey) label = 'Tomorrow — ';
+  if (dateStr === today) label = t('common', 'today') + ' — ';
+  else if (dateStr === tomorrowKey) label = t('common', 'tomorrow') + ' — ';
 
   return (
     label +
@@ -38,6 +39,7 @@ function formatDateHeading(dateStr: string): string {
 }
 
 export default function BookingsPage() {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export default function BookingsPage() {
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Loading your bookings...</p>
+          <p className="mt-4 text-text-light">{t('bookings', 'loadingBookings')}</p>
         </div>
       </div>
     );
@@ -128,10 +130,10 @@ export default function BookingsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-2xl font-bold text-destructive">Error</h1>
+          <h1 className="text-2xl font-bold text-destructive">{t('common', 'error')}</h1>
           <p className="mt-2 text-text-light">{error}</p>
           <Button onClick={() => window.location.reload()} className="mt-4">
-            Try Again
+            {t('common', 'tryAgain')}
           </Button>
         </div>
       </div>
@@ -140,37 +142,37 @@ export default function BookingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-2xl font-bold">My Orders</h1>
+      <h1 className="mb-8 text-2xl font-bold">{t('bookings', 'myOrders')}</h1>
 
       {bookings.length === 0 ? (
         <div className="mx-auto max-w-md py-12 text-center">
           <ShoppingBag className="mx-auto h-16 w-16 text-muted-foreground" />
-          <h2 className="mt-4 text-xl font-semibold">No orders yet</h2>
+          <h2 className="mt-4 text-xl font-semibold">{t('bookings', 'noOrders')}</h2>
           <p className="mt-2 text-text-light">
-            Start exploring local breakfast providers and place your first order!
+            {t('bookings', 'noOrdersDesc')}
           </p>
           <Link href="/providers">
-            <Button className="mt-6">Browse Providers</Button>
+            <Button className="mt-6">{t('common', 'browseProviders')}</Button>
           </Link>
         </div>
       ) : (
         <Tabs defaultValue="active" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="active">
-              Active ({activeBookings.length})
+              {t('bookings', 'active', { count: activeBookings.length })}
             </TabsTrigger>
             <TabsTrigger value="past">
-              Past ({pastBookings.length})
+              {t('bookings', 'past', { count: pastBookings.length })}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="active">
             {activeBookings.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-text-light">No active orders</p>
+                <p className="text-text-light">{t('bookings', 'noActiveOrders')}</p>
                 <Link href="/providers">
                   <Button variant="outline" className="mt-4">
-                    Place an Order
+                    {t('bookings', 'placeAnOrder')}
                   </Button>
                 </Link>
               </div>
@@ -182,17 +184,17 @@ export default function BookingsPage() {
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
                         <p className="font-medium text-amber-800">
-                          {count}-day order pending payment
+                          {t('bookings', 'dayOrderPending', { count })}
                         </p>
                         <p className="text-sm text-amber-600">
-                          Total: {formatCurrency(total)}
+                          {t('common', 'total')}: {formatCurrency(total)}
                         </p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" asChild>
                           <Link href={`/checkout?group=${gId}`}>
                             <CreditCard className="mr-1 h-4 w-4" />
-                            Pay all {count} days
+                            {t('bookings', 'payAllDays', { count })}
                           </Link>
                         </Button>
                       </div>
@@ -208,10 +210,10 @@ export default function BookingsPage() {
                       <div className="flex items-center gap-2 mb-4">
                         <CalendarDays className="h-5 w-5 text-primary" />
                         <h3 className="text-lg font-semibold">
-                          {formatDateHeading(dateKey)}
+                          {formatDateHeading(dateKey, t)}
                         </h3>
                         <Badge variant="secondary" className="ml-auto">
-                          {dayBookings.length} order{dayBookings.length !== 1 ? 's' : ''}
+                          {dayBookings.length} {t('bookings', 'orders')}
                         </Badge>
                       </div>
 
@@ -222,7 +224,7 @@ export default function BookingsPage() {
                             {booking.groupId && groupCounts[booking.groupId] > 1 && (
                               <div className="mb-1">
                                 <Badge variant="outline" className="text-xs">
-                                  Multi-day order ({groupCounts[booking.groupId]} days)
+                                  {t('bookings', 'multiDayOrder', { count: groupCounts[booking.groupId] })}
                                 </Badge>
                               </div>
                             )}
@@ -248,7 +250,7 @@ export default function BookingsPage() {
           <TabsContent value="past">
             {pastBookings.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-text-light">No past orders</p>
+                <p className="text-text-light">{t('bookings', 'noPastOrders')}</p>
               </div>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">

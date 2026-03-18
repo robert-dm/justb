@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { AddressSelector } from '@/components/address';
 import { useAuthStore } from '@/stores';
+import { useTranslation } from '@/hooks';
 import { providersApi } from '@/lib/api';
 import { Address } from '@/types';
 
@@ -37,6 +38,7 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user, refreshUser, updateProfile: storeUpdateProfile, logout } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +62,7 @@ export default function ProfilePage() {
       try {
         await refreshUser();
       } catch (error) {
-        toast.error('Failed to load profile');
+        toast.error(t('profilePage', 'failedToLoad'));
       } finally {
         setIsLoading(false);
       }
@@ -103,10 +105,10 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       await storeUpdateProfile(data);
-      toast.success('Profile updated successfully');
+      toast.success(t('profilePage', 'profileUpdated'));
       reset(data);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to update profile');
+      toast.error(error instanceof Error ? error.message : t('profilePage', 'failedToUpdate'));
     } finally {
       setIsSaving(false);
     }
@@ -115,7 +117,7 @@ export default function ProfilePage() {
   const handleLogout = () => {
     logout();
     router.push('/login');
-    toast.success('Logged out successfully');
+    toast.success(t('profilePage', 'loggedOut'));
   };
 
   if (isLoading) {
@@ -123,7 +125,7 @@ export default function ProfilePage() {
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Loading profile...</p>
+          <p className="mt-4 text-text-light">{t('profilePage', 'loadingProfile')}</p>
         </div>
       </div>
     );
@@ -131,7 +133,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-2xl font-bold">My Profile</h1>
+      <h1 className="mb-8 text-2xl font-bold">{t('profilePage', 'myProfile')}</h1>
 
       <div className="mx-auto max-w-2xl space-y-6">
         {/* Profile Form */}
@@ -139,18 +141,18 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Personal Information
+              {t('profilePage', 'personalInfo')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t('profilePage', 'fullName')}</Label>
                   <Input
                     id="name"
                     {...register('name')}
-                    placeholder="Your name"
+                    placeholder={t('profilePage', 'namePlaceholder')}
                   />
                   {errors.name && (
                     <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -158,12 +160,12 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('profilePage', 'email')}</Label>
                   <Input
                     id="email"
                     type="email"
                     {...register('email')}
-                    placeholder="your@email.com"
+                    placeholder={t('profilePage', 'emailPlaceholder')}
                     disabled
                   />
                   {errors.email && (
@@ -173,11 +175,11 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone (optional)</Label>
+                <Label htmlFor="phone">{t('profilePage', 'phoneOptional')}</Label>
                 <Input
                   id="phone"
                   {...register('phone')}
-                  placeholder="+1 (555) 123-4567"
+                  placeholder={t('profilePage', 'phonePlaceholder')}
                 />
               </div>
 
@@ -185,10 +187,10 @@ export default function ProfilePage() {
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {t('common', 'saving')}
                   </>
                 ) : (
-                  'Save Changes'
+                  t('common', 'saveChanges')
                 )}
               </Button>
             </form>
@@ -200,13 +202,13 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              Address
+              {t('profilePage', 'address')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <p className="text-sm text-muted-foreground">
-                Adding your address helps us recommend nearby providers and estimate delivery times.
+                {t('profilePage', 'addressHelper')}
               </p>
 
               <AddressSelector
@@ -223,10 +225,10 @@ export default function ProfilePage() {
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {t('common', 'saving')}
                   </>
                 ) : (
-                  'Save Address'
+                  t('common', 'saveAddress')
                 )}
               </Button>
             </form>
@@ -236,17 +238,17 @@ export default function ProfilePage() {
         {/* Account Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Account</CardTitle>
+            <CardTitle>{t('profilePage', 'account')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Role</p>
+                <p className="font-medium">{t('profilePage', 'role')}</p>
                 <p className="text-sm text-text-light capitalize">{user?.role}</p>
               </div>
               {user?.role === 'provider' && (
                 <Button variant="outline" onClick={() => router.push('/dashboard')}>
-                  Go to Dashboard
+                  {t('profilePage', 'goToDashboard')}
                 </Button>
               )}
             </div>
@@ -255,9 +257,9 @@ export default function ProfilePage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Sign Out</p>
+                <p className="font-medium">{t('profilePage', 'signOut')}</p>
                 <p className="text-sm text-text-light">
-                  Sign out of your account on this device
+                  {t('profilePage', 'signOutDesc')}
                 </p>
               </div>
               <Button
@@ -266,7 +268,7 @@ export default function ProfilePage() {
                 className="text-destructive hover:text-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
+                {t('profilePage', 'signOut')}
               </Button>
             </div>
           </CardContent>

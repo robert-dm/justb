@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { menuItemsApi } from '@/lib/api';
 import { MenuItem, MenuCategory, Allergen } from '@/types';
+import { useTranslation } from '@/hooks';
 
 const menuItemSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -41,15 +42,6 @@ interface AddMenuItemFormProps {
   onCancel: () => void;
 }
 
-const categories: { value: MenuCategory; label: string }[] = [
-  { value: 'traditional', label: 'Traditional' },
-  { value: 'continental', label: 'Continental' },
-  { value: 'vegan', label: 'Vegan' },
-  { value: 'gluten-free', label: 'Gluten Free' },
-  { value: 'sweet', label: 'Sweet' },
-  { value: 'savory', label: 'Savory' },
-];
-
 export function AddMenuItemForm({
   providerId,
   item,
@@ -58,6 +50,16 @@ export function AddMenuItemForm({
 }: AddMenuItemFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!item;
+  const { t } = useTranslation();
+
+  const categories: { value: MenuCategory; label: string }[] = [
+    { value: 'traditional', label: t('dashboardMenuItem', 'traditional') },
+    { value: 'continental', label: t('dashboardMenuItem', 'continental') },
+    { value: 'vegan', label: t('dashboardMenuItem', 'vegan') },
+    { value: 'gluten-free', label: t('dashboardMenuItem', 'glutenFree') },
+    { value: 'sweet', label: t('dashboardMenuItem', 'sweet') },
+    { value: 'savory', label: t('dashboardMenuItem', 'savory') },
+  ];
 
   const {
     register,
@@ -99,15 +101,15 @@ export function AddMenuItemForm({
     try {
       if (isEditing) {
         const response = await menuItemsApi.update(item._id, payload);
-        toast.success('Menu item updated');
+        toast.success(t('dashboardMenuItem', 'itemUpdated'));
         onSuccess(response.menuItem, false);
       } else {
         const response = await menuItemsApi.create(providerId, payload);
-        toast.success('Menu item created');
+        toast.success(t('dashboardMenuItem', 'itemCreated'));
         onSuccess(response.menuItem, true);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to save menu item');
+      toast.error(error instanceof Error ? error.message : t('dashboardMenuItem', 'failedToSave'));
     } finally {
       setIsSubmitting(false);
     }
@@ -120,18 +122,18 @@ export function AddMenuItemForm({
           <Button variant="ghost" size="sm" onClick={onCancel}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <CardTitle>{isEditing ? 'Edit Menu Item' : 'Add Menu Item'}</CardTitle>
+          <CardTitle>{t('dashboardMenuItem', isEditing ? 'editMenuItem' : 'addMenuItem')}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">{t('dashboardMenuItem', 'nameLabel')}</Label>
               <Input
                 id="name"
                 {...register('name')}
-                placeholder="e.g., Croissant & Coffee"
+                placeholder={t('dashboardMenuItem', 'namePlaceholder')}
               />
               {errors.name && (
                 <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -139,7 +141,7 @@ export function AddMenuItemForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price">Price *</Label>
+              <Label htmlFor="price">{t('dashboardMenuItem', 'priceLabel')}</Label>
               <Input
                 id="price"
                 type="number"
@@ -154,24 +156,24 @@ export function AddMenuItemForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('dashboardMenuItem', 'descriptionLabel')}</Label>
             <Textarea
               id="description"
               {...register('description')}
-              placeholder="Describe your menu item..."
+              placeholder={t('dashboardMenuItem', 'descriptionPlaceholder')}
               rows={3}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t('dashboardMenuItem', 'categoryLabel')}</Label>
               <Select
                 value={selectedCategory}
                 onValueChange={(value) => setValue('category', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t('dashboardMenuItem', 'selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -184,7 +186,7 @@ export function AddMenuItemForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="preparationTime">Preparation Time (minutes)</Label>
+              <Label htmlFor="preparationTime">{t('dashboardMenuItem', 'preparationTime')}</Label>
               <Input
                 id="preparationTime"
                 type="number"
@@ -195,7 +197,7 @@ export function AddMenuItemForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Image</Label>
+            <Label>{t('dashboardMenuItem', 'image')}</Label>
             <ImageUpload
               value={imageValue}
               onChange={(url) => setValue('image', url || '')}
@@ -204,7 +206,7 @@ export function AddMenuItemForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="allergens">Allergens (comma-separated)</Label>
+            <Label htmlFor="allergens">{t('dashboardMenuItem', 'allergensLabel')}</Label>
             <Input
               id="allergens"
               {...register('allergens')}
@@ -214,18 +216,16 @@ export function AddMenuItemForm({
 
           <div className="flex gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
+              {t('common', 'cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? 'Updating...' : 'Creating...'}
+                  {t('dashboardMenuItem', isEditing ? 'updating' : 'creating')}
                 </>
-              ) : isEditing ? (
-                'Update Item'
               ) : (
-                'Create Item'
+                t('dashboardMenuItem', isEditing ? 'updateItem' : 'createItem')
               )}
             </Button>
           </div>

@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { bookingsApi } from '@/lib/api';
 import { Booking } from '@/types';
+import { useTranslation } from '@/hooks';
 
 interface ReviewDialogProps {
   booking: Booking;
@@ -29,6 +30,7 @@ export function ReviewDialog({
   onClose,
   onSubmit,
 }: ReviewDialogProps) {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(5);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -36,7 +38,7 @@ export function ReviewDialog({
 
   const handleSubmit = async () => {
     if (rating < 1 || rating > 5) {
-      toast.error('Please select a rating');
+      toast.error(t('review', 'selectRating'));
       return;
     }
 
@@ -46,10 +48,10 @@ export function ReviewDialog({
         rating,
         comment: comment.trim() || undefined,
       });
-      toast.success('Review submitted successfully!');
+      toast.success(t('review', 'reviewSubmitted'));
       onSubmit(response.booking);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to submit review');
+      toast.error(error instanceof Error ? error.message : t('review', 'failedToSubmit'));
     } finally {
       setIsSubmitting(false);
     }
@@ -61,9 +63,9 @@ export function ReviewDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Review Your Order</DialogTitle>
+          <DialogTitle>{t('review', 'title')}</DialogTitle>
           <DialogDescription>
-            How was your experience with {provider.businessName}?
+            {t('review', 'description', { businessName: provider.businessName })}
           </DialogDescription>
         </DialogHeader>
 
@@ -91,20 +93,20 @@ export function ReviewDialog({
               ))}
             </div>
             <p className="text-sm text-text-light">
-              {rating === 1 && 'Poor'}
-              {rating === 2 && 'Fair'}
-              {rating === 3 && 'Good'}
-              {rating === 4 && 'Very Good'}
-              {rating === 5 && 'Excellent'}
+              {rating === 1 && t('review', 'poor')}
+              {rating === 2 && t('review', 'fair')}
+              {rating === 3 && t('review', 'good')}
+              {rating === 4 && t('review', 'veryGood')}
+              {rating === 5 && t('review', 'excellent')}
             </p>
           </div>
 
           {/* Comment */}
           <div className="space-y-2">
-            <Label htmlFor="comment">Comment (optional)</Label>
+            <Label htmlFor="comment">{t('review', 'commentLabel')}</Label>
             <Textarea
               id="comment"
-              placeholder="Share your experience..."
+              placeholder={t('review', 'commentPlaceholder')}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={4}
@@ -114,16 +116,16 @@ export function ReviewDialog({
           {/* Actions */}
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-              Cancel
+              {t('common', 'cancel')}
             </Button>
             <Button onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting...
+                  {t('review', 'submitting')}
                 </>
               ) : (
-                'Submit Review'
+                t('review', 'submitReview')
               )}
             </Button>
           </div>

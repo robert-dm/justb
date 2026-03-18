@@ -14,6 +14,7 @@ import { QuantityControl } from './quantity-control';
 import { MenuItem, Provider } from '@/types';
 import { useCartStore } from '@/stores';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 // --- Provider header + scrollable items row ---
 
@@ -23,6 +24,7 @@ interface ProviderMenuSectionProps {
 }
 
 export function ProviderMenuSection({ provider, items }: ProviderMenuSectionProps) {
+  const { t } = useTranslation();
   const hasImage = provider.images && provider.images.length > 0 && provider.images[0];
 
   return (
@@ -74,7 +76,7 @@ export function ProviderMenuSection({ provider, items }: ProviderMenuSectionProp
             )}
             {provider.serviceType?.pickup && (
               <Badge variant="outline" className="text-xs px-1.5 py-0">
-                Pickup
+                {t('common', 'pickup')}
               </Badge>
             )}
           </div>
@@ -98,6 +100,7 @@ interface MenuItemTileProps {
 }
 
 function MenuItemTile({ item }: MenuItemTileProps) {
+  const { t } = useTranslation();
   const [showPreview, setShowPreview] = useState(false);
   const { items, addItem, updateQuantity, removeItem, setProvider } = useCartStore();
   const provider = item.providerId;
@@ -225,7 +228,7 @@ function MenuItemTile({ item }: MenuItemTileProps) {
             {/* Allergens */}
             {item.allergens && item.allergens.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-text-light mb-1.5">Allergens</p>
+                <p className="text-xs font-medium text-text-light mb-1.5">{t('menu', 'allergens')}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {item.allergens.map((allergen) => (
                     <Badge key={allergen} variant="outline" className="text-xs capitalize">
@@ -240,7 +243,7 @@ function MenuItemTile({ item }: MenuItemTileProps) {
             <div className="pt-2">
               {quantity === 0 ? (
                 <Button onClick={() => handleIncrease()} className="w-full" size="lg">
-                  Add to order — {formatCurrency(item.price)}
+                  {t('menu', 'addToOrder', { price: formatCurrency(item.price) })}
                 </Button>
               ) : (
                 <div className="flex items-center justify-between">

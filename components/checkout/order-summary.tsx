@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Booking } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 interface OrderSummaryProps {
   booking: Booking;
@@ -13,6 +14,7 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({ booking, compact }: OrderSummaryProps) {
+  const { t } = useTranslation();
   const provider = booking.providerId;
 
   if (compact) {
@@ -50,7 +52,7 @@ export function OrderSummary({ booking, compact }: OrderSummaryProps) {
             <div className="text-right">
               <p className="text-sm font-semibold">{formatCurrency(booking.pricing.total)}</p>
               <p className="text-xs text-text-light">
-                {booking.items.length} item{booking.items.length !== 1 ? 's' : ''}
+                {booking.items.length} {booking.items.length !== 1 ? t('common', 'items') : t('common', 'item')}
               </p>
             </div>
           </div>
@@ -62,7 +64,7 @@ export function OrderSummary({ booking, compact }: OrderSummaryProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Order Summary</CardTitle>
+        <CardTitle>{t('checkout', 'orderSummary')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Provider Info */}
@@ -95,12 +97,12 @@ export function OrderSummary({ booking, compact }: OrderSummaryProps) {
               {booking.deliveryType === 'delivery' ? (
                 <>
                   <Truck className="mr-1 h-3 w-3" />
-                  Delivery
+                  {t('common', 'delivery')}
                 </>
               ) : (
                 <>
                   <Store className="mr-1 h-3 w-3" />
-                  Pickup
+                  {t('common', 'pickup')}
                 </>
               )}
             </Badge>
@@ -130,7 +132,7 @@ export function OrderSummary({ booking, compact }: OrderSummaryProps) {
 
         {/* Order Items */}
         <div className="space-y-2">
-          <p className="font-medium">Items</p>
+          <p className="font-medium">{t('common', 'items')}</p>
           {booking.items.map((item, index) => (
             <div key={index} className="flex justify-between text-sm">
               <span>
@@ -146,22 +148,22 @@ export function OrderSummary({ booking, compact }: OrderSummaryProps) {
         {/* Pricing */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Subtotal</span>
+            <span>{t('common', 'subtotal')}</span>
             <span>{formatCurrency(booking.pricing.subtotal)}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span>Delivery Fee</span>
+            <span>{t('common', 'deliveryFee')}</span>
             <span>{formatCurrency(booking.pricing.deliveryFee)}</span>
           </div>
           {booking.pricing.tax > 0 && (
             <div className="flex justify-between text-sm">
-              <span>Tax</span>
+              <span>{t('common', 'tax')}</span>
               <span>{formatCurrency(booking.pricing.tax)}</span>
             </div>
           )}
           <Separator />
           <div className="flex justify-between font-semibold">
-            <span>Total</span>
+            <span>{t('common', 'total')}</span>
             <span>{formatCurrency(booking.pricing.total)}</span>
           </div>
         </div>

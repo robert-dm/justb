@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { ProviderFilters, ProviderGrid, ProvidersMap } from '@/components/providers';
 import { ProviderMenuSection } from '@/components/menu';
 import { Button } from '@/components/ui/button';
-import { useGeolocation, useGoogleMaps } from '@/hooks';
+import { useGeolocation, useGoogleMaps, useTranslation } from '@/hooks';
 import { useCartStore } from '@/stores';
 import { providersApi, menuItemsApi } from '@/lib/api';
 import { Provider, MenuItem, ProviderFilters as Filters, MenuItemFilters } from '@/types';
@@ -19,6 +19,7 @@ export function ProvidersContent() {
   const searchParams = useSearchParams();
   const { getLocation, isLoading: isLoadingLocation } = useGeolocation();
   const { isLoaded: mapsLoaded } = useGoogleMaps();
+  const { t } = useTranslation();
   const setSearchAddress = useCartStore((s) => s.setSearchAddress);
 
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -69,7 +70,7 @@ export function ProvidersContent() {
       setProviders(providersRes.providers);
       setMenuItems(menuRes.menuItems as (MenuItem & { providerId: Provider })[]);
     } catch (error) {
-      toast.error('Failed to load data');
+      toast.error(t('providers', 'failedToLoad'));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -105,9 +106,9 @@ export function ProvidersContent() {
         setSearchAddress({ street: 'My location', lat: coords.lat, lng: coords.lng });
       }
 
-      toast.success('Location updated');
+      toast.success(t('providers', 'locationUpdated'));
     } else {
-      toast.error('Could not get your location');
+      toast.error(t('providers', 'couldNotGetLocation'));
     }
   };
 
@@ -141,9 +142,7 @@ export function ProvidersContent() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-text-dark">
-              {hasLocation
-                ? 'Breakfast Available Near You'
-                : 'Browse Breakfast Menu'}
+              {t('providers', hasLocation ? 'breakfastNearYou' : 'browseBreakfastMenu')}
             </h1>
             <p className="text-text-light">
               {viewMode === 'menu'
@@ -160,7 +159,7 @@ export function ProvidersContent() {
               onClick={() => setViewMode('menu')}
             >
               <UtensilsCrossed className="h-4 w-4 mr-2" />
-              Menu
+              {t('providers', 'menu')}
             </Button>
             <Button
               variant={viewMode === 'providers' ? 'default' : 'outline'}
@@ -168,7 +167,7 @@ export function ProvidersContent() {
               onClick={() => setViewMode('providers')}
             >
               <Store className="h-4 w-4 mr-2" />
-              Providers
+              {t('providers', 'providersLabel')}
             </Button>
             <Button
               variant={viewMode === 'map' ? 'default' : 'outline'}
@@ -176,7 +175,7 @@ export function ProvidersContent() {
               onClick={() => setViewMode('map')}
             >
               <MapIcon className="h-4 w-4 mr-2" />
-              Map
+              {t('providers', 'map')}
             </Button>
           </div>
         </div>
@@ -216,12 +215,14 @@ function MenuBrowseView({
   >;
   isLoading: boolean;
 }) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Loading menu items...</p>
+          <p className="mt-4 text-text-light">{t('providers', 'loadingMenuItems')}</p>
         </div>
       </div>
     );
@@ -233,9 +234,9 @@ function MenuBrowseView({
     return (
       <div className="py-16 text-center">
         <SearchX className="mx-auto h-16 w-16 text-muted-foreground" />
-        <h3 className="mt-4 text-xl font-semibold">No menu items found</h3>
+        <h3 className="mt-4 text-xl font-semibold">{t('providers', 'noMenuItems')}</h3>
         <p className="mt-2 text-text-light">
-          Try adjusting your location or filters
+          {t('providers', 'tryAdjustingLocation')}
         </p>
       </div>
     );

@@ -16,6 +16,7 @@ import { ImageUpload } from '@/components/ui/image-upload';
 import { AddressSelector } from '@/components/address';
 import { providersApi } from '@/lib/api';
 import { Provider } from '@/types';
+import { useTranslation } from '@/hooks';
 
 const providerSchema = z.object({
   businessName: z.string().min(2, 'Business name is required'),
@@ -50,6 +51,7 @@ interface ProfileTabProps {
 
 export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -92,10 +94,10 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
           coordinates: data.address.coordinates || provider.address?.coordinates,
         } as Provider['address'],
       });
-      toast.success('Profile updated successfully');
+      toast.success(t('dashboardProfile', 'profileUpdated'));
       onUpdate(response.provider);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to update profile');
+      toast.error(error instanceof Error ? error.message : t('dashboardProfile', 'failedToUpdate'));
     } finally {
       setIsSaving(false);
     }
@@ -107,17 +109,17 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Store className="h-5 w-5" />
-            Business Information
+            {t('dashboardProfile', 'businessInfo')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="businessName">Business Name *</Label>
+              <Label htmlFor="businessName">{t('dashboardProfile', 'businessNameLabel')}</Label>
               <Input
                 id="businessName"
                 {...register('businessName')}
-                placeholder="Your business name"
+                placeholder={t('dashboardProfile', 'businessNamePlaceholder')}
               />
               {errors.businessName && (
                 <p className="text-sm text-destructive">
@@ -127,17 +129,17 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('dashboardProfile', 'descriptionLabel')}</Label>
               <Textarea
                 id="description"
                 {...register('description')}
-                placeholder="Tell customers about your business..."
+                placeholder={t('dashboardProfile', 'descriptionPlaceholder')}
                 rows={4}
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Business Image</Label>
+              <Label>{t('dashboardProfile', 'businessImage')}</Label>
               <ImageUpload
                 value={imageValue}
                 onChange={(url) => setValue('image', url || '', { shouldDirty: true })}
@@ -147,7 +149,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="deliveryRadius">Delivery Radius (km)</Label>
+                <Label htmlFor="deliveryRadius">{t('dashboardProfile', 'deliveryRadius')}</Label>
                 <Input
                   id="deliveryRadius"
                   type="number"
@@ -156,7 +158,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="minimumOrder">Minimum Order ($)</Label>
+                <Label htmlFor="minimumOrder">{t('dashboardProfile', 'minimumOrder')}</Label>
                 <Input
                   id="minimumOrder"
                   type="number"
@@ -166,7 +168,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="deliveryFee">Delivery Fee ($)</Label>
+                <Label htmlFor="deliveryFee">{t('dashboardProfile', 'deliveryFeeLabel')}</Label>
                 <Input
                   id="deliveryFee"
                   type="number"
@@ -177,7 +179,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
             </div>
 
             <div className="space-y-4">
-              <Label>Service Types</Label>
+              <Label>{t('dashboardProfile', 'serviceTypes')}</Label>
               <div className="flex gap-6">
                 <div className="flex items-center gap-2">
                   <Switch
@@ -188,7 +190,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
                     }
                   />
                   <Label htmlFor="delivery" className="cursor-pointer">
-                    Delivery
+                    {t('common', 'delivery')}
                   </Label>
                 </div>
 
@@ -201,7 +203,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
                     }
                   />
                   <Label htmlFor="pickup" className="cursor-pointer">
-                    Pickup
+                    {t('common', 'pickup')}
                   </Label>
                 </div>
               </div>
@@ -211,10 +213,10 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {t('common', 'saving')}
                 </>
               ) : (
-                'Save Changes'
+                t('common', 'saveChanges')
               )}
             </Button>
           </form>
@@ -223,7 +225,7 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Address</CardTitle>
+          <CardTitle>{t('dashboardProfile', 'address')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -241,10 +243,10 @@ export function ProfileTab({ provider, onUpdate }: ProfileTabProps) {
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  {t('common', 'saving')}
                 </>
               ) : (
-                'Save Address'
+                t('common', 'saveAddress')
               )}
             </Button>
           </form>

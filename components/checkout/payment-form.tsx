@@ -14,6 +14,7 @@ import { paymentsApi } from '@/lib/api';
 import { Booking } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
 import { useCartStore } from '@/stores';
+import { useTranslation } from '@/hooks';
 
 interface PaymentFormProps {
   booking?: Booking;
@@ -23,6 +24,7 @@ interface PaymentFormProps {
 
 export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -56,15 +58,15 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
     // Basic visual validation
     const cleanCard = cardNumber.replace(/\s/g, '');
     if (cleanCard.length < 16) {
-      toast.error('Please enter a valid card number');
+      toast.error(t('checkout', 'invalidCard'));
       return;
     }
     if (expiry.length < 5) {
-      toast.error('Please enter a valid expiry date');
+      toast.error(t('checkout', 'invalidExpiry'));
       return;
     }
     if (cvc.length < 3) {
-      toast.error('Please enter a valid CVC');
+      toast.error(t('checkout', 'invalidCvc'));
       return;
     }
 
@@ -82,13 +84,13 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
 
       setIsComplete(true);
       clearCart();
-      toast.success('Payment successful!');
+      toast.success(t('checkout', 'paymentSuccessful'));
 
       setTimeout(() => {
         router.push('/bookings');
       }, 2000);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Payment failed');
+      toast.error(error instanceof Error ? error.message : t('checkout', 'paymentFailed'));
       setIsProcessing(false);
     }
   };
@@ -98,12 +100,12 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
       <Card>
         <CardContent className="py-12 text-center">
           <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
-          <h3 className="mt-4 text-xl font-semibold">Payment Successful!</h3>
+          <h3 className="mt-4 text-xl font-semibold">{t('checkout', 'paymentSuccessful')}</h3>
           <p className="mt-2 text-text-light">
             {isMultiDay
-              ? `${allBookings.length} orders confirmed.`
-              : 'Your order has been confirmed.'}{' '}
-            Redirecting...
+              ? t('checkout', 'ordersConfirmed', { count: allBookings.length })
+              : t('checkout', 'orderConfirmed')}{' '}
+            {t('checkout', 'redirecting')}
           </p>
         </CardContent>
       </Card>
@@ -115,11 +117,11 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
-          Payment Details
+          {t('checkout', 'paymentDetails')}
         </CardTitle>
         <div className="flex items-center gap-1 text-xs text-text-light">
           <Lock className="h-3 w-3" />
-          Simulated payment — no real charges
+          {t('checkout', 'simulatedPayment')}
         </div>
       </CardHeader>
       <CardContent>
@@ -129,7 +131,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">
-                {allBookings.length} delivery days
+                {t('checkout', 'deliveryDays', { count: allBookings.length })}
               </span>
             </div>
             <div className="space-y-1">
@@ -149,7 +151,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
             </div>
             <Separator />
             <div className="flex justify-between text-sm font-semibold">
-              <span>Total</span>
+              <span>{t('common', 'total')}</span>
               <span>{formatCurrency(totalAmount)}</span>
             </div>
           </div>
@@ -158,7 +160,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Card number */}
           <div>
-            <Label htmlFor="card-number">Card Number</Label>
+            <Label htmlFor="card-number">{t('checkout', 'cardNumber')}</Label>
             <div className="relative mt-1">
               <Input
                 id="card-number"
@@ -173,7 +175,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
 
           {/* Name */}
           <div>
-            <Label htmlFor="card-name">Name on Card</Label>
+            <Label htmlFor="card-name">{t('checkout', 'nameOnCard')}</Label>
             <Input
               id="card-name"
               placeholder="John Doe"
@@ -186,7 +188,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
           {/* Expiry + CVC */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="expiry">Expiry</Label>
+              <Label htmlFor="expiry">{t('checkout', 'expiry')}</Label>
               <Input
                 id="expiry"
                 placeholder="12/34"
@@ -196,7 +198,7 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
               />
             </div>
             <div>
-              <Label htmlFor="cvc">CVC</Label>
+              <Label htmlFor="cvc">{t('checkout', 'cvc')}</Label>
               <Input
                 id="cvc"
                 placeholder="123"
@@ -209,8 +211,8 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
 
           {/* Test card hint */}
           <div className="rounded-md bg-blue-50 p-3 text-xs text-blue-700">
-            <p className="font-medium">Test mode</p>
-            <p>Use any card number (e.g. 4242 4242 4242 4242), any future expiry, and any CVC.</p>
+            <p className="font-medium">{t('checkout', 'testMode')}</p>
+            <p>{t('checkout', 'testModeDesc')}</p>
           </div>
 
           <Button
@@ -222,12 +224,12 @@ export function PaymentForm({ booking, bookings, groupId }: PaymentFormProps) {
             {isProcessing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing payment...
+                {t('checkout', 'processingPayment')}
               </>
             ) : (
               <>
                 <Lock className="mr-2 h-4 w-4" />
-                Pay {formatCurrency(totalAmount)}
+                {t('checkout', 'pay', { amount: formatCurrency(totalAmount) })}
               </>
             )}
           </Button>
