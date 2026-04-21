@@ -13,6 +13,7 @@ import { ReviewDialog } from './review-dialog';
 import { bookingsApi } from '@/lib/api';
 import { Booking } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 interface BookingCardProps {
   booking: Booking;
@@ -21,6 +22,7 @@ interface BookingCardProps {
 }
 
 export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardProps) {
+  const { t } = useTranslation();
   const [isCancelling, setIsCancelling] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const provider = booking.providerId;
@@ -30,17 +32,17 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
   const canReview = booking.status === 'completed' && !booking.review;
 
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this order?')) {
+    if (!confirm(t('booking', 'confirmCancel'))) {
       return;
     }
 
     setIsCancelling(true);
     try {
       const response = await bookingsApi.cancel(booking._id);
-      toast.success('Order cancelled successfully');
+      toast.success(t('booking', 'orderCancelled'));
       onUpdate?.(response.booking);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to cancel order');
+      toast.error(error instanceof Error ? error.message : t('booking', 'failedToCancel'));
     } finally {
       setIsCancelling(false);
     }
@@ -72,7 +74,7 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
               <div>
                 <p className="font-medium">{provider.businessName}</p>
                 <p className="text-sm text-text-light">
-                  Order #{booking._id.slice(-6).toUpperCase()}
+                  {t('booking', 'orderNumber', { id: booking._id.slice(-6).toUpperCase() })}
                 </p>
               </div>
             </div>
@@ -130,7 +132,7 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
 
           {/* Total */}
           <div className="flex justify-between font-semibold">
-            <span>Total</span>
+            <span>{t('common', 'total')}</span>
             <span>{formatCurrency(booking.pricing.total)}</span>
           </div>
 
@@ -167,22 +169,22 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
               <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-amber-800">Payment pending</p>
-                    <p className="text-xs text-amber-600">Complete payment to confirm your order</p>
+                    <p className="text-sm font-medium text-amber-800">{t('booking', 'paymentPending')}</p>
+                    <p className="text-xs text-amber-600">{t('booking', 'completePayment')}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" asChild>
                     <Link href={`/checkout?booking=${booking._id}`}>
                       <CreditCard className="mr-1 h-4 w-4" />
-                      Pay this day — {formatCurrency(booking.pricing.total)}
+                      {t('booking', 'payThisDay', { total: formatCurrency(booking.pricing.total) })}
                     </Link>
                   </Button>
                   {booking.groupId && groupDayCount && groupDayCount > 1 && (
                     <Button size="sm" asChild>
                       <Link href={`/checkout?group=${booking.groupId}`}>
                         <CreditCard className="mr-1 h-4 w-4" />
-                        Pay all {groupDayCount} days
+                        {t('booking', 'payAllDays', { count: groupDayCount })}
                       </Link>
                     </Button>
                   )}
@@ -209,7 +211,7 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
                     ) : (
                       <>
                         <X className="mr-1 h-4 w-4" />
-                        Cancel Order
+                        {t('booking', 'cancelOrder')}
                       </>
                     )}
                   </Button>
@@ -221,7 +223,7 @@ export function BookingCard({ booking, onUpdate, groupDayCount }: BookingCardPro
                     onClick={() => setShowReviewDialog(true)}
                   >
                     <Star className="mr-1 h-4 w-4" />
-                    Leave Review
+                    {t('booking', 'leaveReview')}
                   </Button>
                 )}
               </div>

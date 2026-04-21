@@ -2,30 +2,41 @@
 
 import { Badge } from '@/components/ui/badge';
 import { BookingStatus } from '@/types';
+import { useTranslation } from '@/hooks';
 
 interface StatusBadgeProps {
   status: BookingStatus;
 }
 
-const statusConfig: Record<
-  BookingStatus,
-  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
-> = {
-  pending: { label: 'Pending', variant: 'secondary' },
-  confirmed: { label: 'Confirmed', variant: 'default' },
-  preparing: { label: 'Preparing', variant: 'default' },
-  'on-the-way': { label: 'On the Way', variant: 'default' },
-  delivered: { label: 'Delivered', variant: 'default' },
-  completed: { label: 'Completed', variant: 'outline' },
-  cancelled: { label: 'Cancelled', variant: 'destructive' },
+const statusVariants: Record<BookingStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  pending: 'secondary',
+  confirmed: 'default',
+  preparing: 'default',
+  'on-the-way': 'default',
+  delivered: 'default',
+  completed: 'outline',
+  cancelled: 'destructive',
+};
+
+const statusLabelKeys: Record<BookingStatus, string> = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  preparing: 'preparing',
+  'on-the-way': 'onTheWay',
+  delivered: 'delivered',
+  completed: 'completed',
+  cancelled: 'cancelled',
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const config = statusConfig[status] || { label: status, variant: 'secondary' };
+  const { t } = useTranslation();
+  const variant = statusVariants[status] || 'secondary';
+  const labelKey = statusLabelKeys[status];
+  const label = labelKey ? t('status', labelKey as 'pending' | 'confirmed' | 'preparing' | 'onTheWay' | 'delivered' | 'completed' | 'cancelled') : status;
 
   return (
-    <Badge variant={config.variant} className="capitalize">
-      {config.label}
+    <Badge variant={variant} className="capitalize">
+      {label}
     </Badge>
   );
 }

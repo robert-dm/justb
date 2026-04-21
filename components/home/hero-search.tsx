@@ -4,12 +4,13 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useGoogleMaps, useGeolocation } from '@/hooks';
+import { useGoogleMaps, useGeolocation, useTranslation } from '@/hooks';
 import { useCartStore } from '@/stores';
 import { toast } from 'sonner';
 
 export function HeroSearch() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { isLoaded } = useGoogleMaps();
   const { getLocation, isLoading: isGettingLocation } = useGeolocation();
   const setSearchAddress = useCartStore((s) => s.setSearchAddress);
@@ -26,7 +27,7 @@ export function HeroSearch() {
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry?.location) {
-        toast.error('Could not find that address. Try another one.');
+        toast.error(t('heroSearch', 'addressNotFound'));
         return;
       }
 
@@ -61,7 +62,7 @@ export function HeroSearch() {
       }
       router.push(`/providers?lat=${coords.lat}&lng=${coords.lng}`);
     } else {
-      toast.error('Could not get your location. Please type an address instead.');
+      toast.error(t('heroSearch', 'locationError'));
     }
   };
 
@@ -71,7 +72,7 @@ export function HeroSearch() {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Where are you staying?"
+          placeholder={t('heroSearch', 'placeholder')}
           className="flex-1 rounded-full px-6 py-3 text-base outline-none placeholder:text-text-light"
         />
         <Button
@@ -80,11 +81,11 @@ export function HeroSearch() {
           onClick={() => {
             // If user typed but didn't select from autocomplete, trigger a search
             if (inputRef.current?.value) {
-              toast.info('Please select an address from the dropdown suggestions.');
+              toast.info(t('heroSearch', 'selectFromDropdown'));
             }
           }}
         >
-          Search
+          {t('heroSearch', 'search')}
         </Button>
       </div>
 
@@ -98,7 +99,7 @@ export function HeroSearch() {
         ) : (
           <MapPin className="h-4 w-4" />
         )}
-        Use my current location
+        {t('heroSearch', 'useMyLocation')}
       </button>
     </div>
   );

@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/card';
 import { useAuthStore } from '@/stores';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
+import { useTranslation } from '@/hooks';
 
 export function LoginForm() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export function LoginForm() {
   const redirectTo = searchParams.get('redirect') || '/providers';
 
   const { login } = useAuthStore();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -46,7 +48,7 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login(data);
-      toast.success('Welcome back!');
+      toast.success(t('auth', 'welcomeBackToast'));
 
       // Redirect based on user role
       const user = useAuthStore.getState().user;
@@ -56,7 +58,7 @@ export function LoginForm() {
         router.push(redirectTo);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Login failed');
+      toast.error(error instanceof Error ? error.message : t('auth', 'loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -65,19 +67,19 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+        <CardTitle className="text-2xl">{t('auth', 'welcomeBack')}</CardTitle>
         <CardDescription>
-          Sign in to your account to continue
+          {t('auth', 'signInToContinue')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth', 'email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('auth', 'emailPlaceholder')}
               {...register('email')}
               disabled={isLoading}
             />
@@ -87,7 +89,7 @@ export function LoginForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth', 'password')}</Label>
             <Input
               id="password"
               type="password"
@@ -106,17 +108,17 @@ export function LoginForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
+                {t('auth', 'signingIn')}
               </>
             ) : (
-              'Sign In'
+              t('auth', 'signIn')
             )}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            {t('auth', 'noAccount')}{' '}
             <Link href="/register" className="text-primary hover:underline">
-              Sign up
+              {t('auth', 'signUp')}
             </Link>
           </p>
         </CardFooter>

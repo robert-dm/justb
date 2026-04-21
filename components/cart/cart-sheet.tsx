@@ -18,6 +18,7 @@ import {
   Copy,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -69,6 +70,7 @@ function getNextDate(dateStr: string): string {
 
 export function CartSheet() {
   const router = useRouter();
+  const { t } = useTranslation();
   const isAuthenticated = useIsAuthenticated();
   const cartItemCount = useCartItemCount();
   const {
@@ -109,13 +111,13 @@ export function CartSheet() {
 
   const handleContinue = () => {
     if (!isAuthenticated) {
-      toast.error('Please login to continue');
+      toast.error(t('cart', 'pleaseLogin'));
       setOpen(false);
       router.push('/login');
       return;
     }
     if (items.length === 0) {
-      toast.error('Your cart is empty');
+      toast.error(t('cart', 'cartEmpty'));
       return;
     }
     setStep('confirm');
@@ -153,7 +155,7 @@ export function CartSheet() {
     setDays((prev) => {
       const firstDay = prev[0];
       if (!firstDay?.date || !firstDay?.time) {
-        toast.error('Set the first day and time first');
+        toast.error(t('cart', 'setFirstDay'));
         return prev;
       }
       const newDays: DeliveryDay[] = [firstDay];
@@ -172,15 +174,15 @@ export function CartSheet() {
     const newErrors: Record<string, string> = {};
 
     if (deliveryType === 'delivery' && !searchAddress?.street) {
-      newErrors.address = 'Please search for providers from an address first';
+      newErrors.address = t('cart', 'searchAddressFirst');
     }
 
     const seenDates = new Set<string>();
     days.forEach((day, i) => {
-      if (!day.date) newErrors[`day_${i}_date`] = 'Required';
-      if (!day.time) newErrors[`day_${i}_time`] = 'Required';
-      if (day.date && day.date < minDate) newErrors[`day_${i}_date`] = 'Must be tomorrow or later';
-      if (day.date && seenDates.has(day.date)) newErrors[`day_${i}_date`] = 'Duplicate date';
+      if (!day.date) newErrors[`day_${i}_date`] = t('common', 'required');
+      if (!day.time) newErrors[`day_${i}_time`] = t('common', 'required');
+      if (day.date && day.date < minDate) newErrors[`day_${i}_date`] = t('cart', 'mustBeTomorrow');
+      if (day.date && seenDates.has(day.date)) newErrors[`day_${i}_date`] = t('cart', 'duplicateDate');
       if (day.date) seenDates.add(day.date);
     });
 
@@ -244,7 +246,7 @@ export function CartSheet() {
           pricing,
         });
 
-        toast.success('Order created! Redirecting to payment...');
+        toast.success(t('cart', 'orderCreated'));
         setOpen(false);
         setStep('cart');
         router.push(`/checkout?booking=${response.booking._id}`);
@@ -259,13 +261,13 @@ export function CartSheet() {
           pricing,
         });
 
-        toast.success(`${response.bookings.length} orders created! Redirecting to payment...`);
+        toast.success(t('cart', 'ordersCreated', { count: response.bookings.length }));
         setOpen(false);
         setStep('cart');
         router.push(`/checkout?group=${response.groupId}`);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create order');
+      toast.error(error instanceof Error ? error.message : t('cart', 'failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -277,9 +279,9 @@ export function CartSheet() {
   const renderEmpty = () => (
     <div className="flex flex-1 flex-col items-center justify-center text-center px-5">
       <ShoppingBag className="h-16 w-16 text-muted-foreground" />
-      <p className="mt-4 text-lg font-medium text-text-dark">Your cart is empty</p>
+      <p className="mt-4 text-lg font-medium text-text-dark">{t('cart', 'emptyCart')}</p>
       <p className="mt-1 text-sm text-text-light">
-        Add items from the menu to get started
+        {t('cart', 'emptyCartDesc')}
       </p>
       <Button
         variant="outline"
@@ -289,7 +291,7 @@ export function CartSheet() {
           router.push('/providers');
         }}
       >
-        Browse Menu
+        {t('common', 'browseMenu')}
       </Button>
     </div>
   );
@@ -299,7 +301,7 @@ export function CartSheet() {
     <div className="flex flex-1 flex-col overflow-hidden">
       {provider && (
         <p className="px-5 pb-3 text-sm text-text-light">
-          From{' '}
+          {t('common', 'from')}{' '}
           <span className="font-medium text-text-dark">{provider.businessName}</span>
         </p>
       )}
@@ -339,11 +341,11 @@ export function CartSheet() {
 
       <div className="border-t bg-background px-5 py-4 space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-text-light">Subtotal ({cartItemCount} items)</span>
+          <span className="text-text-light">{t('cart', 'subtotalItems', { count: cartItemCount })}</span>
           <span className="font-medium">{formatCurrency(getSubtotal())}</span>
         </div>
         <Button className="w-full" size="lg" onClick={handleContinue}>
-          Continue
+          {t('cart', 'continue')}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
@@ -360,13 +362,13 @@ export function CartSheet() {
           className="inline-flex items-center gap-1 text-sm text-text-light hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Edit items
+          {t('cart', 'editItems')}
         </button>
 
         {/* Order summary */}
         <div className="rounded-lg border p-3 space-y-2">
           <p className="text-xs font-medium text-text-light uppercase tracking-wide">
-            Order Summary
+            {t('cart', 'orderSummary')}
           </p>
           {items.map((item) => (
             <div key={item.menuItemId} className="flex items-center gap-2">
@@ -390,14 +392,14 @@ export function CartSheet() {
 
         {/* Delivery type */}
         <div>
-          <Label className="text-sm font-medium">Delivery Type</Label>
+          <Label className="text-sm font-medium">{t('cart', 'deliveryType')}</Label>
           <Select value={deliveryType} onValueChange={(v: DeliveryType) => setDeliveryType(v)}>
             <SelectTrigger className="mt-1">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {hasDelivery && <SelectItem value="delivery">Delivery</SelectItem>}
-              {hasPickup && <SelectItem value="pickup">Pickup</SelectItem>}
+              {hasDelivery && <SelectItem value="delivery">{t('common', 'delivery')}</SelectItem>}
+              {hasPickup && <SelectItem value="pickup">{t('common', 'pickup')}</SelectItem>}
             </SelectContent>
           </Select>
         </div>
@@ -405,7 +407,7 @@ export function CartSheet() {
         {/* Delivery address */}
         {deliveryType === 'delivery' && (
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Delivery Address</Label>
+            <Label className="text-sm font-medium">{t('cart', 'deliveryAddress')}</Label>
             <div className="flex items-start gap-2 rounded-lg bg-muted/50 border p-3">
               <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
               <div className="min-w-0 flex-1">
@@ -413,7 +415,7 @@ export function CartSheet() {
                   <p className="text-sm text-text-dark">{searchAddress.street}</p>
                 ) : (
                   <p className="text-sm text-destructive">
-                    No address set. Please search from the providers page first.
+                    {t('cart', 'noAddressSet')}
                   </p>
                 )}
               </div>
@@ -424,20 +426,20 @@ export function CartSheet() {
               <div>
                 <Label className="text-xs text-text-light">
                   <Building2 className="inline h-3 w-3 mr-1" />
-                  Apt / Unit
+                  {t('cart', 'aptUnit')}
                 </Label>
-                <Input placeholder="e.g. 4B" value={apt} onChange={(e) => setApt(e.target.value)} className="mt-1" />
+                <Input placeholder={t('cart', 'aptPlaceholder')} value={apt} onChange={(e) => setApt(e.target.value)} className="mt-1" />
               </div>
               <div>
-                <Label className="text-xs text-text-light">Floor</Label>
-                <Input placeholder="e.g. 3" value={floor} onChange={(e) => setFloor(e.target.value)} className="mt-1" />
+                <Label className="text-xs text-text-light">{t('cart', 'floor')}</Label>
+                <Input placeholder={t('cart', 'floorPlaceholder')} value={floor} onChange={(e) => setFloor(e.target.value)} className="mt-1" />
               </div>
             </div>
 
             <div>
-              <Label className="text-xs text-text-light">Delivery Notes</Label>
+              <Label className="text-xs text-text-light">{t('cart', 'deliveryNotes')}</Label>
               <Textarea
-                placeholder="Ring bell, leave at door, gate code..."
+                placeholder={t('cart', 'deliveryNotesPlaceholder')}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
@@ -452,7 +454,7 @@ export function CartSheet() {
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium flex items-center gap-1">
               <CalendarDays className="h-4 w-4" />
-              Delivery Days
+              {t('cart', 'deliveryDays')}
             </Label>
             {days.length < 14 && (
               <Button
@@ -463,7 +465,7 @@ export function CartSheet() {
                 className="h-7 text-xs text-primary"
               >
                 <Plus className="h-3 w-3 mr-1" />
-                Add day
+                {t('cart', 'addDay')}
               </Button>
             )}
           </div>
@@ -481,7 +483,7 @@ export function CartSheet() {
                   onClick={() => addConsecutiveDays(n)}
                 >
                   <Copy className="h-3 w-3 mr-1" />
-                  {n} days
+                  {`${n} ${t('common', 'days')}`}
                 </Button>
               ))}
             </div>
@@ -514,7 +516,7 @@ export function CartSheet() {
                     <SelectTrigger
                       className={`h-9 w-24 text-sm flex-shrink-0 ${errors[`day_${index}_time`] ? 'border-destructive' : ''}`}
                     >
-                      <SelectValue placeholder="Time" />
+                      <SelectValue placeholder={t('cart', 'time')} />
                     </SelectTrigger>
                     <SelectContent>
                       {TIME_SLOTS.map((slot) => (
@@ -555,7 +557,7 @@ export function CartSheet() {
 
           {days.length > 1 && (
             <p className="text-xs text-text-light bg-muted/50 rounded p-2">
-              Same order will be placed for {days.length} days. You can change the delivery time for each day.
+              {t('cart', 'multiDayNote', { count: days.length })}
             </p>
           )}
         </div>
@@ -565,23 +567,23 @@ export function CartSheet() {
       <div className="border-t bg-background px-5 py-4 space-y-3">
         <div className="space-y-1.5">
           <div className="flex justify-between text-sm">
-            <span className="text-text-light">Per day</span>
+            <span className="text-text-light">{t('common', 'perDay')}</span>
             <span>{formatCurrency(getTotal())}</span>
           </div>
           {days.length > 1 && (
             <div className="flex justify-between text-sm">
-              <span className="text-text-light">x {days.length} days</span>
+              <span className="text-text-light">x {days.length} {t('common', 'days')}</span>
               <span>{formatCurrency(totalForAllDays)}</span>
             </div>
           )}
           {deliveryType === 'delivery' && (
             <div className="flex justify-between text-xs text-text-light">
-              <span>Includes delivery fee {formatCurrency(getDeliveryFee())}/day</span>
+              <span>{t('cart', 'includesDeliveryFee', { fee: formatCurrency(getDeliveryFee()) })}</span>
             </div>
           )}
           <Separator />
           <div className="flex justify-between font-semibold text-base">
-            <span>Total</span>
+            <span>{t('common', 'total')}</span>
             <span>{formatCurrency(totalForAllDays)}</span>
           </div>
         </div>
@@ -595,12 +597,12 @@ export function CartSheet() {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating {days.length > 1 ? `${days.length} orders` : 'order'}...
+              {days.length > 1 ? t('cart', 'creatingOrders', { count: days.length }) : t('cart', 'creatingOrder')}
             </>
           ) : days.length > 1 ? (
-            `Place ${days.length} Orders — ${formatCurrency(totalForAllDays)}`
+            t('cart', 'placeOrders', { count: days.length, total: formatCurrency(totalForAllDays) })
           ) : (
-            `Place Order — ${formatCurrency(getTotal())}`
+            t('cart', 'placeOrder', { total: formatCurrency(getTotal()) })
           )}
         </Button>
       </div>
@@ -622,7 +624,7 @@ export function CartSheet() {
       <SheetContent className="flex w-full flex-col sm:max-w-md p-0">
         <SheetHeader className="px-5 pt-5 pb-0">
           <SheetTitle className="flex items-center justify-between">
-            <span>{step === 'cart' ? 'Your Order' : 'Confirm Order'}</span>
+            <span>{step === 'cart' ? t('cart', 'yourOrder') : t('cart', 'confirmOrder')}</span>
             {step === 'cart' && items.length > 0 && (
               <Button
                 variant="ghost"

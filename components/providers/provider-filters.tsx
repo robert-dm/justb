@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { useGoogleMaps } from '@/hooks';
+import { useGoogleMaps, useTranslation } from '@/hooks';
 import { useCartStore } from '@/stores';
 import { toast } from 'sonner';
 
@@ -30,6 +30,7 @@ export function ProviderFilters({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoaded } = useGoogleMaps();
+  const { t } = useTranslation();
   const setSearchAddress = useCartStore((s) => s.setSearchAddress);
   const addressInputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -72,7 +73,7 @@ export function ProviderFilters({
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
       if (!place.geometry?.location) {
-        toast.error('Could not find that location. Please try a different address.');
+        toast.error(t('providers', 'locationNotFound'));
         return;
       }
 
@@ -86,7 +87,7 @@ export function ProviderFilters({
       params.set('lat', lat.toString());
       params.set('lng', lng.toString());
       router.push(`/providers?${params.toString()}`);
-      toast.success('Showing providers near ' + street);
+      toast.success(t('providers', 'showingNear') + ' ' + street);
     });
 
     autocompleteRef.current = autocomplete;
@@ -101,7 +102,7 @@ export function ProviderFilters({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               ref={addressInputRef}
-              placeholder="Enter an address to find nearby providers..."
+              placeholder={t('providers', 'addressPlaceholder')}
               className="bg-white pl-9"
             />
           </div>
@@ -115,14 +116,14 @@ export function ProviderFilters({
             ) : (
               <MapPin className="h-4 w-4" />
             )}
-            <span className="ml-2 hidden sm:inline">Use My Location</span>
+            <span className="ml-2 hidden sm:inline">{t('providers', 'useMyLocation')}</span>
           </Button>
         </div>
       </div>
 
       {/* Filter Options */}
       <div className="flex flex-wrap items-center gap-6">
-        <span className="font-medium text-text-dark">Filters:</span>
+        <span className="font-medium text-text-dark">{t('providers', 'filters')}</span>
 
         {/* Delivery */}
         <div className="flex items-center gap-2">
@@ -132,7 +133,7 @@ export function ProviderFilters({
             onCheckedChange={() => toggleFilter('delivery')}
           />
           <Label htmlFor="delivery" className="cursor-pointer text-sm">
-            Delivery Available
+            {t('providers', 'deliveryAvailable')}
           </Label>
         </div>
 
@@ -144,7 +145,7 @@ export function ProviderFilters({
             onCheckedChange={() => toggleFilter('pickup')}
           />
           <Label htmlFor="pickup" className="cursor-pointer text-sm">
-            Pickup Available
+            {t('providers', 'pickupAvailable')}
           </Label>
         </div>
 
@@ -154,14 +155,14 @@ export function ProviderFilters({
           onValueChange={(value) => updateFilter('cuisine', value === 'all' ? null : value)}
         >
           <SelectTrigger className="w-40 bg-white">
-            <SelectValue placeholder="All Cuisines" />
+            <SelectValue placeholder={t('providers', 'allCuisines')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Cuisines</SelectItem>
-            <SelectItem value="traditional">Traditional</SelectItem>
-            <SelectItem value="continental">Continental</SelectItem>
-            <SelectItem value="vegan">Vegan</SelectItem>
-            <SelectItem value="gluten-free">Gluten-Free</SelectItem>
+            <SelectItem value="all">{t('providers', 'allCuisines')}</SelectItem>
+            <SelectItem value="traditional">{t('providers', 'traditional')}</SelectItem>
+            <SelectItem value="continental">{t('providers', 'continental')}</SelectItem>
+            <SelectItem value="vegan">{t('providers', 'vegan')}</SelectItem>
+            <SelectItem value="gluten-free">{t('providers', 'glutenFree')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -171,12 +172,12 @@ export function ProviderFilters({
           onValueChange={(value) => updateFilter('minRating', value === 'all' ? null : value)}
         >
           <SelectTrigger className="w-32 bg-white">
-            <SelectValue placeholder="All Ratings" />
+            <SelectValue placeholder={t('providers', 'allRatings')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Ratings</SelectItem>
-            <SelectItem value="4">4+ Stars</SelectItem>
-            <SelectItem value="4.5">4.5+ Stars</SelectItem>
+            <SelectItem value="all">{t('providers', 'allRatings')}</SelectItem>
+            <SelectItem value="4">{t('providers', 'fourPlusStars')}</SelectItem>
+            <SelectItem value="4.5">{t('providers', 'fourFivePlusStars')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

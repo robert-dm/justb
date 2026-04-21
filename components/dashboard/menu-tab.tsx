@@ -10,6 +10,7 @@ import { AddMenuItemForm } from './add-menu-item-form';
 import { menuItemsApi } from '@/lib/api';
 import { MenuItem } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 interface MenuTabProps {
   providerId: string;
@@ -22,6 +23,7 @@ export function MenuTab({ providerId }: MenuTabProps) {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchMenuItems();
@@ -32,7 +34,7 @@ export function MenuTab({ providerId }: MenuTabProps) {
       const response = await menuItemsApi.getByProvider(providerId);
       setMenuItems(response.menuItems);
     } catch (error) {
-      toast.error('Failed to load menu items');
+      toast.error(t('dashboardMenu', 'failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -45,24 +47,24 @@ export function MenuTab({ providerId }: MenuTabProps) {
       setMenuItems((prev) =>
         prev.map((i) => (i._id === item._id ? response.menuItem : i))
       );
-      toast.success(`${item.name} is now ${response.menuItem.available ? 'available' : 'unavailable'}`);
+      toast.success(response.menuItem.available ? t('dashboardMenu', 'isNowAvailable', { name: item.name }) : t('dashboardMenu', 'isNowUnavailable', { name: item.name }));
     } catch (error) {
-      toast.error('Failed to update availability');
+      toast.error(t('dashboardMenu', 'failedToToggle'));
     } finally {
       setTogglingId(null);
     }
   };
 
   const handleDelete = async (item: MenuItem) => {
-    if (!confirm(`Are you sure you want to delete "${item.name}"?`)) return;
+    if (!confirm(t('dashboardMenu', 'confirmDelete', { name: item.name }))) return;
 
     setDeletingId(item._id);
     try {
       await menuItemsApi.delete(item._id);
       setMenuItems((prev) => prev.filter((i) => i._id !== item._id));
-      toast.success('Menu item deleted');
+      toast.success(t('dashboardMenu', 'itemDeleted'));
     } catch (error) {
-      toast.error('Failed to delete menu item');
+      toast.error(t('dashboardMenu', 'failedToDelete'));
     } finally {
       setDeletingId(null);
     }
@@ -106,21 +108,21 @@ export function MenuTab({ providerId }: MenuTabProps) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">
-          Menu Items ({menuItems.length})
+          {t('dashboardMenu', 'menuItems', { count: menuItems.length })}
         </h3>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Item
+          {t('dashboardMenu', 'addItem')}
         </Button>
       </div>
 
       {menuItems.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-text-light">No menu items yet</p>
+            <p className="text-text-light">{t('dashboardMenu', 'noMenuItems')}</p>
             <Button className="mt-4" onClick={() => setShowForm(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Your First Item
+              {t('dashboardMenu', 'addFirstItem')}
             </Button>
           </CardContent>
         </Card>
@@ -149,7 +151,7 @@ export function MenuTab({ providerId }: MenuTabProps) {
                         variant={item.available ? 'default' : 'secondary'}
                         className="text-xs"
                       >
-                        {item.available ? 'Available' : 'Unavailable'}
+                        {item.available ? t('menu', 'available') : t('menu', 'unavailable')}
                       </Badge>
                     </div>
 
@@ -179,12 +181,12 @@ export function MenuTab({ providerId }: MenuTabProps) {
                     ) : item.available ? (
                       <>
                         <ToggleRight className="mr-1 h-4 w-4" />
-                        Disable
+                        {t('dashboardMenu', 'disable')}
                       </>
                     ) : (
                       <>
                         <ToggleLeft className="mr-1 h-4 w-4" />
-                        Enable
+                        {t('dashboardMenu', 'enable')}
                       </>
                     )}
                   </Button>
@@ -195,7 +197,7 @@ export function MenuTab({ providerId }: MenuTabProps) {
                     onClick={() => setEditingItem(item)}
                   >
                     <Edit2 className="mr-1 h-4 w-4" />
-                    Edit
+                    {t('common', 'edit')}
                   </Button>
 
                   <Button
@@ -210,7 +212,7 @@ export function MenuTab({ providerId }: MenuTabProps) {
                     ) : (
                       <>
                         <Trash2 className="mr-1 h-4 w-4" />
-                        Delete
+                        {t('common', 'delete')}
                       </>
                     )}
                   </Button>

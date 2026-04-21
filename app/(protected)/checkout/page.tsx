@@ -7,9 +7,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { OrderSummary, PaymentForm } from '@/components/checkout';
 import { bookingsApi } from '@/lib/api';
+import { useTranslation } from '@/hooks';
 import { Booking } from '@/types';
 
 export default function CheckoutPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('booking');
@@ -22,7 +24,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     async function fetchBookings() {
       if (!bookingId && !groupId) {
-        setError('No booking ID provided');
+        setError(t('checkout', 'noBookingId'));
         setIsLoading(false);
         return;
       }
@@ -34,7 +36,7 @@ export default function CheckoutPage() {
             (a: Booking, b: Booking) => a.deliveryDate.localeCompare(b.deliveryDate)
           );
           if (groupBookings.length === 0) {
-            setError('No bookings found for this group');
+            setError(t('checkout', 'noBookingsForGroup'));
           } else {
             setBookings(groupBookings);
           }
@@ -43,7 +45,7 @@ export default function CheckoutPage() {
           setBookings([response.booking]);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load booking');
+        setError(err instanceof Error ? err.message : t('checkout', 'failedToLoadBooking'));
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +59,7 @@ export default function CheckoutPage() {
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Loading checkout...</p>
+          <p className="mt-4 text-text-light">{t('checkout', 'loadingCheckout')}</p>
         </div>
       </div>
     );
@@ -67,10 +69,10 @@ export default function CheckoutPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-2xl font-bold text-destructive">Error</h1>
-          <p className="mt-2 text-text-light">{error || 'Booking not found'}</p>
+          <h1 className="text-2xl font-bold text-destructive">{t('common', 'error')}</h1>
+          <p className="mt-2 text-text-light">{error || t('checkout', 'bookingNotFound')}</p>
           <Link href="/providers">
-            <Button className="mt-4">Browse Providers</Button>
+            <Button className="mt-4">{t('common', 'browseProviders')}</Button>
           </Link>
         </div>
       </div>
@@ -92,12 +94,12 @@ export default function CheckoutPage() {
       <Link href="/providers">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Providers
+          {t('checkout', 'backToProviders')}
         </Button>
       </Link>
 
       <h1 className="mb-8 text-2xl font-bold">
-        {isMultiDay ? `Checkout — ${bookings.length} Days` : 'Checkout'}
+        {isMultiDay ? t('checkout', 'titleMultiDay', { count: bookings.length }) : t('checkout', 'title')}
       </h1>
 
       <div className="grid gap-8 lg:grid-cols-2">

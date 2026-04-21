@@ -7,12 +7,14 @@ import { QuantityControl } from './quantity-control';
 import { MenuItem } from '@/types';
 import { useCartStore } from '@/stores';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 interface MenuItemCardProps {
   item: MenuItem;
 }
 
 export function MenuItemCard({ item }: MenuItemCardProps) {
+  const { t } = useTranslation();
   const { items, addItem, updateQuantity, removeItem } = useCartStore();
 
   const cartItem = items.find((i) => i.menuItemId === item._id);
@@ -92,7 +94,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
       <div className="ml-4">
         {quantity === 0 ? (
           <Button onClick={handleIncrease} size="sm">
-            Add
+            {t('common', 'add')}
           </Button>
         ) : (
           <QuantityControl

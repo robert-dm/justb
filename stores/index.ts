@@ -12,3 +12,9 @@ export {
   useCartProvider,
   type CartItem,
 } from './cart-store';
+
+export {
+  useLanguageStore,
+  LOCALES,
+  type Locale,
+} from './language-store';

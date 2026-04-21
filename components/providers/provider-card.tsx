@@ -1,15 +1,19 @@
+'use client';
+
 import Link from 'next/link';
 import { Star, MapPin, Truck, Store, UtensilsCrossed } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Provider } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 interface ProviderCardProps {
   provider: Provider;
 }
 
 export function ProviderCard({ provider }: ProviderCardProps) {
+  const { t } = useTranslation();
   const hasImage = provider.images && provider.images.length > 0 && provider.images[0];
 
   return (
@@ -41,13 +45,13 @@ export function ProviderCard({ provider }: ProviderCardProps) {
             {provider.serviceType.delivery && (
               <Badge variant="secondary" className="gap-1 text-xs px-2 py-0.5">
                 <Truck className="h-3 w-3" />
-                Delivery
+                {t('common', 'delivery')}
               </Badge>
             )}
             {provider.serviceType.pickup && (
               <Badge variant="outline" className="gap-1 text-xs px-2 py-0.5">
                 <Store className="h-3 w-3" />
-                Pickup
+                {t('common', 'pickup')}
               </Badge>
             )}
           </div>

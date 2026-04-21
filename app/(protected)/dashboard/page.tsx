@@ -16,9 +16,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { providersApi } from '@/lib/api';
 import { useAuthStore } from '@/stores';
+import { useTranslation } from '@/hooks';
 import { Provider } from '@/types';
 
 export default function DashboardPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuthStore();
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -60,7 +62,7 @@ export default function DashboardPage() {
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-text-light">Loading dashboard...</p>
+          <p className="mt-4 text-text-light">{t('dashboard', 'loadingDashboard')}</p>
         </div>
       </div>
     );
@@ -70,9 +72,9 @@ export default function DashboardPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-2xl font-bold">Welcome, Provider!</h1>
+          <h1 className="text-2xl font-bold">{t('dashboard', 'welcomeProvider')}</h1>
           <p className="mt-2 text-text-light">
-            You need to set up your business profile to start receiving orders.
+            {t('dashboard', 'setupProfile')}
           </p>
           <CreateProviderForm
             onSuccess={(newProvider) => {
@@ -89,8 +91,8 @@ export default function DashboardPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-md text-center">
-          <h1 className="text-2xl font-bold text-destructive">Error</h1>
-          <p className="mt-2 text-text-light">{error || 'Something went wrong'}</p>
+          <h1 className="text-2xl font-bold text-destructive">{t('common', 'error')}</h1>
+          <p className="mt-2 text-text-light">{error || t('dashboard', 'somethingWentWrong')}</p>
         </div>
       </div>
     );
@@ -100,22 +102,22 @@ export default function DashboardPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">{provider.businessName}</h1>
-        <p className="text-text-light">Provider Dashboard</p>
+        <p className="text-text-light">{t('dashboard', 'providerDashboard')}</p>
       </div>
 
       <Tabs defaultValue="orders" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="orders" className="gap-2">
             <Package className="h-4 w-4" />
-            Orders
+            {t('dashboard', 'orders')}
           </TabsTrigger>
           <TabsTrigger value="menu" className="gap-2">
             <UtensilsCrossed className="h-4 w-4" />
-            Menu
+            {t('dashboard', 'menu')}
           </TabsTrigger>
           <TabsTrigger value="profile" className="gap-2">
             <Settings className="h-4 w-4" />
-            Profile
+            {t('dashboard', 'profile')}
           </TabsTrigger>
         </TabsList>
 
@@ -160,6 +162,7 @@ function CreateProviderForm({
 }: {
   onSuccess: (provider: Provider) => void;
 }) {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -187,7 +190,7 @@ function CreateProviderForm({
   const onSubmit = async (data: ProviderCreationData) => {
     // Validate coordinates are present
     if (!data.address.coordinates?.lat || !data.address.coordinates?.lng) {
-      toast.error('Please select your location on the map');
+      toast.error(t('dashboard', 'selectLocation'));
       return;
     }
 
@@ -198,10 +201,10 @@ function CreateProviderForm({
         description: data.description,
         address: data.address,
       });
-      toast.success('Profile created! You can now add menu items.');
+      toast.success(t('dashboard', 'profileCreated'));
       onSuccess(response.provider);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create profile');
+      toast.error(error instanceof Error ? error.message : t('dashboard', 'failedToCreateProfile'));
     } finally {
       setIsSubmitting(false);
     }
@@ -211,11 +214,11 @@ function CreateProviderForm({
     <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6 max-w-2xl mx-auto">
       {/* Business Name */}
       <div>
-        <Label htmlFor="businessName">Business Name *</Label>
+        <Label htmlFor="businessName">{t('dashboard', 'businessName')}</Label>
         <Input
           id="businessName"
           {...register('businessName')}
-          placeholder="Your business name"
+          placeholder={t('dashboard', 'businessNamePlaceholder')}
           className="mt-1.5"
         />
         {errors.businessName && (
@@ -225,11 +228,11 @@ function CreateProviderForm({
 
       {/* Description */}
       <div>
-        <Label htmlFor="description">Description *</Label>
+        <Label htmlFor="description">{t('dashboard', 'description')}</Label>
         <Textarea
           id="description"
           {...register('description')}
-          placeholder="Tell customers about your breakfast offerings..."
+          placeholder={t('dashboard', 'descriptionPlaceholder')}
           className="mt-1.5 min-h-[80px]"
         />
         {errors.description && (
@@ -250,7 +253,7 @@ function CreateProviderForm({
       {/* Submit Button */}
       <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isSubmitting ? 'Creating Profile...' : 'Create Profile'}
+        {t('dashboard', isSubmitting ? 'creatingProfile' : 'createProfile')}
       </Button>
     </form>
   );

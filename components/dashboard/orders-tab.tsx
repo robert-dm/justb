@@ -23,6 +23,7 @@ import { StatusBadge } from '@/components/booking';
 import { bookingsApi } from '@/lib/api';
 import { Booking, BookingStatus } from '@/types';
 import { formatCurrency } from '@/lib/utils/format';
+import { useTranslation } from '@/hooks';
 
 const statusFlow: BookingStatus[] = [
   'pending',
@@ -32,14 +33,6 @@ const statusFlow: BookingStatus[] = [
   'delivered',
   'completed',
 ];
-
-const nextStatusLabel: Record<string, string> = {
-  pending: 'Confirm Order',
-  confirmed: 'Start Preparing',
-  preparing: 'Out for Delivery',
-  'on-the-way': 'Mark Delivered',
-  delivered: 'Complete',
-};
 
 function formatDateKey(date: Date): string {
   return date.toISOString().split('T')[0];
@@ -87,6 +80,7 @@ export function OrdersTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [weekOffset, setWeekOffset] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchBookings();
@@ -97,7 +91,7 @@ export function OrdersTab() {
       const response = await bookingsApi.getProviderBookings();
       setBookings(response.bookings);
     } catch (error) {
-      toast.error('Failed to load orders');
+      toast.error(t('dashboardOrders', 'failedToLoadOrders'));
     } finally {
       setIsLoading(false);
     }
@@ -115,12 +109,20 @@ export function OrdersTab() {
       setBookings((prev) =>
         prev.map((b) => (b._id === booking._id ? response.booking : b))
       );
-      toast.success(`Order updated to ${nextStatus}`);
+      toast.success(t('dashboardOrders', 'orderUpdated', { status: nextStatus }));
     } catch (error) {
-      toast.error('Failed to update order status');
+      toast.error(t('dashboardOrders', 'failedToUpdate'));
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const nextStatusLabel: Record<string, string> = {
+    pending: t('dashboardOrders', 'confirmOrder'),
+    confirmed: t('dashboardOrders', 'startPreparing'),
+    preparing: t('dashboardOrders', 'outForDelivery'),
+    'on-the-way': t('dashboardOrders', 'markDelivered'),
+    delivered: t('dashboardOrders', 'complete'),
   };
 
   // Week navigation
@@ -199,7 +201,7 @@ export function OrdersTab() {
         <div className="text-center">
           <h3 className="font-semibold flex items-center justify-center gap-2">
             <CalendarDays className="h-5 w-5" />
-            Delivery Schedule
+            {t('dashboardOrders', 'deliverySchedule')}
           </h3>
           <p className="text-sm text-text-light">{weekLabel}</p>
         </div>
@@ -221,7 +223,7 @@ export function OrdersTab() {
             onClick={() => setWeekOffset(0)}
             className="text-primary"
           >
-            Jump to this week
+            {t('dashboardOrders', 'jumpToThisWeek')}
           </Button>
         </div>
       )}
@@ -269,9 +271,9 @@ export function OrdersTab() {
                     </p>
                     {dayBookings.length > 0 && (
                       <p className="text-xs text-text-light">
-                        {dayBookings.length} order{dayBookings.length !== 1 ? 's' : ''}
-                        {activeCount > 0 && ` · ${activeCount} active`}
-                        {deliveredCount > 0 && ` · ${deliveredCount} delivered`}
+                        {dayBookings.length} {t('bookings', 'orders')}
+                        {activeCount > 0 && ` · ${activeCount} ${t('dashboardOrders', 'active')}`}
+                        {deliveredCount > 0 && ` · ${deliveredCount} ${t('dashboardOrders', 'delivered')}`}
                       </p>
                     )}
                   </div>
@@ -289,7 +291,7 @@ export function OrdersTab() {
 
               {/* Bookings for this day */}
               {dayBookings.length === 0 ? (
-                <p className="text-sm text-text-light pl-4 pb-2">No orders</p>
+                <p className="text-sm text-text-light pl-4 pb-2">{t('dashboardOrders', 'noOrders')}</p>
               ) : (
                 <div className="space-y-3 pl-2">
                   {dayBookings.map((booking) => (
@@ -299,6 +301,7 @@ export function OrdersTab() {
                       isUpdating={updatingId === booking._id}
                       onUpdateStatus={handleUpdateStatus}
                       groupDayCount={booking.groupId ? groupCounts[booking.groupId] : undefined}
+                      nextStatusLabel={nextStatusLabel}
                     />
                   ))}
                 </div>
@@ -318,10 +321,12 @@ interface OrderCardProps {
   isUpdating: boolean;
   onUpdateStatus: (booking: Booking) => void;
   groupDayCount?: number;
+  nextStatusLabel: Record<string, string>;
 }
 
-function OrderCard({ booking, isUpdating, onUpdateStatus, groupDayCount }: OrderCardProps) {
+function OrderCard({ booking, isUpdating, onUpdateStatus, groupDayCount, nextStatusLabel }: OrderCardProps) {
   const isTerminal = ['completed', 'cancelled'].includes(booking.status);
+  const { t } = useTranslation();
   const customer = booking.userId as unknown as {
     name?: string;
     email?: string;
@@ -344,7 +349,7 @@ function OrderCard({ booking, isUpdating, onUpdateStatus, groupDayCount }: Order
               </span>
               {groupDayCount && groupDayCount > 1 && (
                 <Badge variant="outline" className="text-xs">
-                  {groupDayCount}-day order
+                  {t('booking', 'dayOrder', { count: groupDayCount })}
                 </Badge>
               )}
             </div>
@@ -398,7 +403,7 @@ function OrderCard({ booking, isUpdating, onUpdateStatus, groupDayCount }: Order
             ) : (
               <p className="text-sm text-text-light flex items-center gap-1">
                 <Package className="h-3.5 w-3.5" />
-                Pickup
+                {t('common', 'pickup')}
               </p>
             )}
             <p className="font-semibold mt-1">

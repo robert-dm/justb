@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/card';
 import { useAuthStore } from '@/stores';
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth';
+import { useTranslation } from '@/hooks';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export function RegisterForm() {
   const defaultRole = searchParams.get('role') === 'provider' ? 'provider' : 'tourist';
 
   const { register: registerUser } = useAuthStore();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -60,17 +62,17 @@ export function RegisterForm() {
     setIsLoading(true);
     try {
       await registerUser(data);
-      toast.success('Account created successfully!');
+      toast.success(t('auth', 'accountCreated'));
 
       // Redirect based on role
       if (data.role === 'provider') {
-        toast.info('Complete your provider profile to start receiving orders');
+        toast.info(t('auth', 'completeProfile'));
         router.push('/dashboard');
       } else {
         router.push('/providers');
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Registration failed');
+      toast.error(error instanceof Error ? error.message : t('auth', 'registrationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -79,19 +81,19 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Create Account</CardTitle>
+        <CardTitle className="text-2xl">{t('auth', 'createAccount')}</CardTitle>
         <CardDescription>
-          Join justB to discover local breakfast options
+          {t('auth', 'joinJustB')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t('auth', 'fullName')}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="John Doe"
+              placeholder={t('auth', 'fullNamePlaceholder')}
               {...register('name')}
               disabled={isLoading}
             />
@@ -101,11 +103,11 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth', 'email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('auth', 'emailPlaceholder')}
               {...register('email')}
               disabled={isLoading}
             />
@@ -115,7 +117,7 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth', 'password')}</Label>
             <Input
               id="password"
               type="password"
@@ -129,32 +131,32 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone (Optional)</Label>
+            <Label htmlFor="phone">{t('auth', 'phoneOptional')}</Label>
             <Input
               id="phone"
               type="tel"
-              placeholder="+1 (555) 000-0000"
+              placeholder={t('auth', 'phonePlaceholder')}
               {...register('phone')}
               disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">I want to...</Label>
+            <Label htmlFor="role">{t('auth', 'iWantTo')}</Label>
             <Select
               value={selectedRole}
               onValueChange={(value: 'tourist' | 'provider') => setValue('role', value)}
               disabled={isLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select your role" />
+                <SelectValue placeholder={t('auth', 'selectRole')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="tourist">
-                  Find breakfast (Tourist)
+                  {t('auth', 'findBreakfastTourist')}
                 </SelectItem>
                 <SelectItem value="provider">
-                  Sell breakfast (Provider)
+                  {t('auth', 'sellBreakfastProvider')}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -165,8 +167,7 @@ export function RegisterForm() {
 
           {selectedRole === 'provider' && (
             <div className="rounded-lg bg-secondary/10 p-3 text-sm text-muted-foreground">
-              As a provider, you&apos;ll be able to create your business profile,
-              add menu items, and receive orders from tourists.
+              {t('auth', 'providerNote')}
             </div>
           )}
         </CardContent>
@@ -176,17 +177,17 @@ export function RegisterForm() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
+                {t('auth', 'creatingAccount')}
               </>
             ) : (
-              'Create Account'
+              t('auth', 'createAccount')
             )}
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('auth', 'alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-primary hover:underline">
-              Sign in
+              {t('auth', 'signInLink')}
             </Link>
           </p>
         </CardFooter>

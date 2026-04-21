@@ -10,6 +10,7 @@ import { MenuItemCard } from '@/components/menu';
 import { CartSidebar } from '@/components/cart';
 import { useCartStore } from '@/stores';
 import { Provider, MenuItem } from '@/types';
+import { useTranslation } from '@/hooks';
 
 interface ProviderDetailContentProps {
   provider: Provider;
@@ -20,6 +21,7 @@ export function ProviderDetailContent({
   provider,
   menuItems,
 }: ProviderDetailContentProps) {
+  const { t } = useTranslation();
   const { setProvider, provider: cartProvider, clearCart } = useCartStore();
 
   // Set provider in cart store, clear if different provider
@@ -44,13 +46,13 @@ export function ProviderDetailContent({
   );
 
   const categoryLabels: Record<string, string> = {
-    traditional: 'Traditional',
-    continental: 'Continental',
-    vegan: 'Vegan',
-    'gluten-free': 'Gluten Free',
-    sweet: 'Sweet',
-    savory: 'Savory',
-    other: 'Other',
+    traditional: t('provider', 'traditional'),
+    continental: t('provider', 'continental'),
+    vegan: t('provider', 'vegan'),
+    'gluten-free': t('provider', 'glutenFree'),
+    sweet: t('provider', 'sweet'),
+    savory: t('provider', 'savory'),
+    other: t('provider', 'other'),
   };
 
   return (
@@ -59,7 +61,7 @@ export function ProviderDetailContent({
       <Link href="/providers">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Providers
+          {t('provider', 'backToProviders')}
         </Button>
       </Link>
 
@@ -97,7 +99,7 @@ export function ProviderDetailContent({
                             {provider.rating.average.toFixed(1)}
                           </span>
                           <span className="text-text-light">
-                            ({provider.rating.count} reviews)
+                            ({provider.rating.count} {t('common', 'reviews')})
                           </span>
                         </div>
                       )}
@@ -132,7 +134,7 @@ export function ProviderDetailContent({
                       <div className="flex items-center gap-2 text-text-light">
                         <Truck className="h-4 w-4" />
                         <span>
-                          Delivers within {provider.deliveryRadius}km
+                          {t('provider', 'deliversWithin', { radius: provider.deliveryRadius })}
                         </span>
                       </div>
                     )}
@@ -140,7 +142,7 @@ export function ProviderDetailContent({
                     {provider.minimumOrder && (
                       <div className="flex items-center gap-2 text-text-light">
                         <Clock className="h-4 w-4" />
-                        <span>Min. order ${provider.minimumOrder}</span>
+                        <span>{t('provider', 'minOrder', { amount: provider.minimumOrder })}</span>
                       </div>
                     )}
                   </div>
@@ -150,13 +152,13 @@ export function ProviderDetailContent({
                     {provider.serviceType?.delivery && (
                       <Badge variant="outline">
                         <Truck className="mr-1 h-3 w-3" />
-                        Delivery
+                        {t('common', 'delivery')}
                       </Badge>
                     )}
                     {provider.serviceType?.pickup && (
                       <Badge variant="outline">
                         <Store className="mr-1 h-3 w-3" />
-                        Pickup
+                        {t('common', 'pickup')}
                       </Badge>
                     )}
                   </div>
@@ -185,7 +187,7 @@ export function ProviderDetailContent({
             <Card>
               <CardContent className="py-12 text-center">
                 <p className="text-text-light">
-                  No menu items available at the moment.
+                  {t('provider', 'noMenuItems')}
                 </p>
               </CardContent>
             </Card>

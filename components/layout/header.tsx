@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAuthStore } from '@/stores';
+import { useTranslation } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,9 +13,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, LayoutDashboard, ClipboardList } from 'lucide-react';
 import { CartSheet } from '@/components/cart';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 
 export function Header() {
   const { user, token, logout } = useAuthStore();
+  const { t } = useTranslation();
   const isAuthenticated = !!token;
   const isProvider = user?.role === 'provider';
 
@@ -34,8 +37,12 @@ export function Header() {
               href="/providers"
               className="font-medium text-text-dark transition-colors hover:text-primary"
             >
-              Find Breakfast
+              {t('header', 'findBreakfast')}
             </Link>
+          </li>
+
+          <li>
+            <LanguageSwitcher />
           </li>
 
           {isAuthenticated ? (
@@ -45,7 +52,7 @@ export function Header() {
                   href="/bookings"
                   className="font-medium text-text-dark transition-colors hover:text-primary"
                 >
-                  My Bookings
+                  {t('header', 'myBookings')}
                 </Link>
               </li>
 
@@ -55,7 +62,7 @@ export function Header() {
                     href="/dashboard"
                     className="font-medium text-text-dark transition-colors hover:text-primary"
                   >
-                    Dashboard
+                    {t('header', 'dashboard')}
                   </Link>
                 </li>
               )}
@@ -78,20 +85,20 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/profile" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
-                        Profile
+                        {t('header', 'profile')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/bookings" className="flex items-center gap-2">
                         <ClipboardList className="h-4 w-4" />
-                        My Bookings
+                        {t('header', 'myBookings')}
                       </Link>
                     </DropdownMenuItem>
                     {isProvider && (
                       <DropdownMenuItem asChild>
                         <Link href="/dashboard" className="flex items-center gap-2">
                           <LayoutDashboard className="h-4 w-4" />
-                          Dashboard
+                          {t('header', 'dashboard')}
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -101,7 +108,7 @@ export function Header() {
                       className="flex items-center gap-2 text-red-600"
                     >
                       <LogOut className="h-4 w-4" />
-                      Logout
+                      {t('header', 'logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -114,12 +121,12 @@ export function Header() {
                   href="/login"
                   className="font-medium text-text-dark transition-colors hover:text-primary"
                 >
-                  Login
+                  {t('header', 'login')}
                 </Link>
               </li>
               <li>
                 <Button asChild>
-                  <Link href="/register">Sign Up</Link>
+                  <Link href="/register">{t('header', 'signUp')}</Link>
                 </Button>
               </li>
             </>
