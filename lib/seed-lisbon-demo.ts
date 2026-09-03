@@ -196,20 +196,20 @@ export async function ensureLisbonDemoData(): Promise<void> {
   }
 
   try {
-    // Check if we have any providers
-    const providerCount = await Provider.countDocuments();
-    
-    if (providerCount > 0) {
-      // Data exists, no need to seed
-      return;
-    }
-
-    console.log('No providers found, auto-seeding Lisbon demo data...');
     seedingInProgress = true;
 
     const hashedPassword = await bcrypt.hash('demo1234', 10);
+    let createdCount = 0;
     
     for (const providerData of DEMO_PROVIDERS) {
+      // Check if this specific demo provider already exists (by email)
+      const existingUser = await User.findOne({ email: providerData.email });
+      
+      if (existingUser) {
+        // This Lisbon demo provider already exists, skip
+        continue;
+      }
+
       // Create user for the provider
       const user = await User.create({
         name: providerData.businessName,
@@ -268,11 +268,14 @@ export async function ensureLisbonDemoData(): Promise<void> {
       
       // Create menu items for this provider
       await seedMenuItems(provider._id, providerData.cuisine);
+      createdCount++;
     }
     
-    const finalProviderCount = await Provider.countDocuments();
-    const menuItemCount = await MenuItem.countDocuments();
-    console.log(`✅ Auto-seeded ${finalProviderCount} providers with ${menuItemCount} menu items`);
+    if (createdCount > 0) {
+      console.log(`✅ Added ${createdCount} missing Lisbon demo provider(s)`);
+    } else {
+      console.log('✅ All Lisbon demo providers already exist');
+    }
   } catch (error) {
     console.error('❌ Auto-seed failed:', error);
   } finally {
