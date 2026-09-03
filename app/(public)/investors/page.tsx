@@ -1,139 +1,116 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import {
-  FileText,
-  TrendingUp,
-  PresentationIcon,
-  HelpCircle,
-  BarChart3,
-  Lock,
-} from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, Building2, Calendar } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Investor Portal - justB',
-  description: 'Investment information and resources for justB stakeholders',
+  title: 'Strategic Overview - justB',
+  description: 'justB strategic overview for corporate development',
 };
-
-const stats = [
-  { number: '$2.5M', label: 'Seed Funding Target' },
-  { number: '10x', label: 'Revenue Growth YoY' },
-  { number: '45%', label: 'Gross Margin' },
-  { number: '15K+', label: 'Active Users' },
-];
-
-const navCards = [
-  {
-    icon: FileText,
-    title: 'Executive Summary',
-    description: 'Company overview, mission, and key value propositions',
-    href: '/investors/summary',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Financials',
-    description: 'Revenue projections, unit economics, and funding details',
-    href: '/investors/financials',
-  },
-  {
-    icon: PresentationIcon,
-    title: 'Pitch Deck',
-    description: 'Complete investor presentation with market analysis',
-    href: '/investors/deck',
-  },
-  {
-    icon: HelpCircle,
-    title: 'Investor FAQ',
-    description: 'Common questions about the investment opportunity',
-    href: '/investors/faq',
-  },
-  {
-    icon: BarChart3,
-    title: 'Market Research',
-    description: 'Industry analysis, competition, and growth trends',
-    href: '/investors/market',
-  },
-];
 
 export default function InvestorsPage() {
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-secondary px-4 py-20 text-center text-white">
-        <div className="container mx-auto">
-          <h1 className="text-4xl font-bold md:text-5xl">Investor Portal</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-xl opacity-95">
-            Welcome to the justB investor portal. Access comprehensive information
-            about our investment opportunity.
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <section className="border-b bg-white px-6 py-12">
+        <div className="container mx-auto max-w-4xl">
+          <h1 className="text-3xl font-bold text-text-dark">justB</h1>
+          <p className="mt-2 text-lg text-text-light">
+            Local breakfast delivery to vacation rentals
           </p>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          {stats.map((stat, index) => (
-            <Card key={index}>
-              <CardContent className="py-8 text-center">
-                <p className="text-4xl font-bold text-primary">{stat.number}</p>
-                <p className="mt-2 text-text-light">{stat.label}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Confidential Notice */}
-      <section className="container mx-auto px-4">
-        <div className="rounded-lg border-2 border-yellow-300 bg-yellow-50 p-6 text-center">
-          <div className="flex items-center justify-center gap-2 text-yellow-800">
-            <Lock className="h-5 w-5" />
-            <span className="font-medium">Confidential Information</span>
+      {/* Main Content */}
+      <section className="container mx-auto max-w-4xl px-6 py-12">
+        <div className="space-y-10">
+          {/* What it is */}
+          <div>
+            <h2 className="mb-3 text-xl font-semibold text-text-dark">What it is</h2>
+            <p className="leading-relaxed text-text-dark">
+              A marketplace connecting tourists in short-term rentals with local breakfast providers for scheduled morning delivery or pickup.
+            </p>
           </div>
-          <p className="mt-2 text-sm text-yellow-700">
-            The information contained in this portal is confidential and intended
-            solely for potential investors. Please do not distribute without
-            authorization.
-          </p>
-        </div>
-      </section>
 
-      {/* Navigation Cards */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="mb-8 text-center text-2xl font-bold">
-          Investment Resources
-        </h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {navCards.map((card, index) => (
-            <Link key={index} href={card.href}>
-              <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lg">
-                <CardContent className="p-6">
-                  <card.icon className="h-12 w-12 text-primary" />
-                  <h3 className="mt-4 text-lg font-semibold text-primary">
-                    {card.title}
-                  </h3>
-                  <p className="mt-2 text-text-light">{card.description}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
+          {/* Why Lisbon First */}
+          <div>
+            <h2 className="mb-3 flex items-center gap-2 text-xl font-semibold text-text-dark">
+              <MapPin className="h-5 w-5" />
+              Why Lisbon first
+            </h2>
+            <div className="space-y-3 leading-relaxed text-text-dark">
+              <p>
+                Lisbon ranks <strong>5th in the EU</strong> for short-stay platform nights with <strong>11.6M guest nights</strong> (Eurostat 2025). 
+                Approximately 20,000 registered STRs, with ~75% concentrated in six historic parishes: Santa Maria Maior (Alfama), Misericórdia (Bairro Alto), 
+                Arroios, Santo António (Avenida da Liberdade), São Vicente, and Estrela.
+              </p>
+              <p>
+                This density makes morning delivery operationally viable. Portuguese breakfast culture—pastelarias, padarias, traditional cafés—is 
+                embedded in these neighborhoods, providing a natural supply base.
+              </p>
+            </div>
+          </div>
 
-      {/* CTA Section */}
-      <section className="bg-background-light px-4 py-16">
-        <div className="container mx-auto text-center">
-          <h2 className="text-2xl font-bold">Ready to Learn More?</h2>
-          <p className="mx-auto mt-4 max-w-lg text-text-light">
-            Contact our investor relations team to schedule a call or request
-            additional information.
-          </p>
-          <a
-            href="mailto:investors@justb.app"
-            className="mt-6 inline-block rounded-lg bg-primary px-8 py-3 font-medium text-white hover:bg-primary/90"
-          >
-            Contact Investor Relations
-          </a>
+          {/* Current Status */}
+          <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-6">
+            <h2 className="mb-3 flex items-center gap-2 text-xl font-semibold text-blue-900">
+              <Calendar className="h-5 w-5" />
+              Current status
+            </h2>
+            <div className="space-y-2 text-blue-900">
+              <p>
+                <strong>Product:</strong> Live prototype at <a href="https://justb-psi.vercel.app" className="underline hover:text-blue-700">justb-psi.vercel.app</a>
+              </p>
+              <p>
+                <strong>Marketplace data:</strong> Demo listings (seeded providers and menus for Lisbon)
+              </p>
+              <p>
+                <strong>Real providers:</strong> 0
+              </p>
+              <p>
+                <strong>Real orders:</strong> 0
+              </p>
+            </div>
+          </div>
+
+          {/* Why Airbnb */}
+          <div>
+            <h2 className="mb-3 flex items-center gap-2 text-xl font-semibold text-text-dark">
+              <Building2 className="h-5 w-5" />
+              Why Airbnb
+            </h2>
+            <div className="space-y-3 leading-relaxed text-text-dark">
+              <p>
+                Airbnb Summer Release 2026 introduced <strong>Services</strong>: Instacart grocery delivery (US), CookUnity prepared meals (US), 
+                airport pickups, luggage storage. Gap justB addresses: <strong>authentic local breakfast</strong> delivered to the rental in 
+                tourist STR cities.
+              </p>
+              <p>
+                This is not US grocery staples or heat-and-eat kits—it's the daily morning ritual at the listing. Benefits:
+              </p>
+              <ul className="list-disc space-y-1 pl-6">
+                <li>Host differentiation and guest retention</li>
+                <li>Take-rate on a daily habit vs. one-time airport transfer</li>
+                <li>City-module approach: plug local providers into Services infrastructure</li>
+                <li>Enhances "live like a local" positioning</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* What a buyer underwrites */}
+          <div>
+            <h2 className="mb-3 text-xl font-semibold text-text-dark">What a buyer is underwriting</h2>
+            <p className="leading-relaxed text-text-dark">
+              Density of 7–9am deliveries in one compact STR neighborhood, not a global platform story. Unit of execution is the 
+              parish-level provider cluster, not the city. Scale via replication: if Alfama works, Bairro Alto is next, then Príncipe Real, 
+              then Porto's Ribeira, then Barcelona's Gòtic—one neighborhood at a time.
+            </p>
+          </div>
+
+          {/* Contact */}
+          <div className="border-t pt-8">
+            <p className="text-text-dark">
+              <strong>Contact:</strong> Robert · justB
+            </p>
+          </div>
         </div>
       </section>
     </div>

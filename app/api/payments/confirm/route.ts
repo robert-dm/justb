@@ -4,9 +4,14 @@ import connectDB from '@/lib/db';
 import Booking from '@/lib/models/Booking';
 import { getAuthUser, unauthorizedResponse, errorResponse } from '@/lib/auth';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-12-15.clover',
-});
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-12-15.clover',
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,6 +26,7 @@ export async function POST(request: NextRequest) {
     const { paymentIntentId, bookingId } = body;
 
     // Retrieve payment intent from Stripe
+    const stripe = getStripe();
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status === 'succeeded') {
