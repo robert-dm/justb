@@ -131,28 +131,28 @@ const DEMO_PROVIDERS = [
 // Portuguese menu items for each provider type
 const MENU_TEMPLATES = {
   traditional: [
-    { name: 'Pastel de Nata', price: 1.5, description: 'Traditional Portuguese custard tart', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'dairy', 'gluten'] },
-    { name: 'Pão com Manteiga', price: 2, description: 'Fresh bread with butter', category: 'savory', preparationTime: 5, allergens: ['gluten', 'dairy'] },
-    { name: 'Galão', price: 2.5, description: 'Portuguese latte (espresso with hot milk)', category: 'traditional', preparationTime: 5, allergens: ['dairy'] },
-    { name: 'Torrada', price: 2.5, description: 'Toasted bread with butter and jam', category: 'traditional', preparationTime: 8, allergens: ['gluten', 'dairy'] },
-    { name: 'Bolo de Arroz', price: 1.8, description: 'Traditional rice cake', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'gluten'] },
-    { name: 'Queijo da Serra', price: 4, description: 'Portuguese mountain cheese with bread', category: 'savory', preparationTime: 5, allergens: ['dairy', 'gluten'] },
+    { name: 'Pastel de Nata', price: 1.5, description: 'Traditional Portuguese custard tart', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'dairy', 'gluten'], image: '/demo-food/pastel-de-nata.jpg' },
+    { name: 'Pão com Manteiga', price: 2, description: 'Fresh bread with butter', category: 'savory', preparationTime: 5, allergens: ['gluten', 'dairy'], image: '/demo-food/bread.jpg' },
+    { name: 'Galão', price: 2.5, description: 'Portuguese latte (espresso with hot milk)', category: 'traditional', preparationTime: 5, allergens: ['dairy'], image: '/demo-food/coffee.jpg' },
+    { name: 'Torrada', price: 2.5, description: 'Toasted bread with butter and jam', category: 'traditional', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/bread.jpg' },
+    { name: 'Bolo de Arroz', price: 1.8, description: 'Traditional rice cake', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'gluten'], image: '/demo-food/pastel-de-nata.jpg' },
+    { name: 'Queijo da Serra', price: 4, description: 'Portuguese mountain cheese with bread', category: 'savory', preparationTime: 5, allergens: ['dairy', 'gluten'], image: '/demo-food/cheese.jpg' },
   ],
   continental: [
-    { name: 'Croissant', price: 2.2, description: 'Butter croissant', category: 'continental', preparationTime: 5, allergens: ['gluten', 'dairy'] },
-    { name: 'Continental Breakfast', price: 8.5, description: 'Coffee, croissant, juice, and fruit', category: 'continental', preparationTime: 10, allergens: ['gluten', 'dairy'] },
-    { name: 'Cappuccino', price: 2.8, description: 'Italian-style espresso with steamed milk', category: 'continental', preparationTime: 5, allergens: ['dairy'] },
-    { name: 'Fresh Orange Juice', price: 3.5, description: 'Freshly squeezed Algarve oranges', category: 'continental', preparationTime: 5, allergens: [] },
+    { name: 'Croissant', price: 2.2, description: 'Butter croissant', category: 'continental', preparationTime: 5, allergens: ['gluten', 'dairy'], image: '/demo-food/croissant.jpg' },
+    { name: 'Continental Breakfast', price: 8.5, description: 'Coffee, croissant, juice, and fruit', category: 'continental', preparationTime: 10, allergens: ['gluten', 'dairy'], image: '/demo-food/croissant.jpg' },
+    { name: 'Cappuccino', price: 2.8, description: 'Italian-style espresso with steamed milk', category: 'continental', preparationTime: 5, allergens: ['dairy'], image: '/demo-food/coffee.jpg' },
+    { name: 'Fresh Orange Juice', price: 3.5, description: 'Freshly squeezed Algarve oranges', category: 'continental', preparationTime: 5, allergens: [], image: '/demo-food/juice.jpg' },
   ],
   hearty: [
-    { name: 'Ovos Mexidos com Chouriço', price: 6.5, description: 'Scrambled eggs with Portuguese chorizo', category: 'savory', preparationTime: 12, allergens: ['eggs'] },
-    { name: 'Tosta Mista', price: 4.5, description: 'Grilled ham and cheese sandwich', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'] },
-    { name: 'Sandes de Presunto', price: 5, description: 'Portuguese ham sandwich with cheese', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'] },
+    { name: 'Ovos Mexidos com Chouriço', price: 6.5, description: 'Scrambled eggs with Portuguese chorizo', category: 'savory', preparationTime: 12, allergens: ['eggs'], image: '/demo-food/eggs.jpg' },
+    { name: 'Tosta Mista', price: 4.5, description: 'Grilled ham and cheese sandwich', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/sandwich.jpg' },
+    { name: 'Sandes de Presunto', price: 5, description: 'Portuguese ham sandwich with cheese', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/sandwich.jpg' },
   ],
   healthy: [
-    { name: 'Açaí Bowl', price: 7.5, description: 'Açaí with granola, banana, and honey', category: 'sweet', preparationTime: 10, allergens: ['nuts'] },
-    { name: 'Yogurt & Granola', price: 5.5, description: 'Greek yogurt with homemade granola and berries', category: 'sweet', preparationTime: 8, allergens: ['dairy', 'nuts'] },
-    { name: 'Fresh Fruit Salad', price: 4.5, description: 'Seasonal Portuguese fruits', category: 'sweet', preparationTime: 10, allergens: [] },
+    { name: 'Açaí Bowl', price: 7.5, description: 'Açaí with granola, banana, and honey', category: 'sweet', preparationTime: 10, allergens: ['nuts'], image: '/demo-food/acai-bowl.jpg' },
+    { name: 'Yogurt & Granola', price: 5.5, description: 'Greek yogurt with homemade granola and berries', category: 'sweet', preparationTime: 8, allergens: ['dairy', 'nuts'], image: '/demo-food/yogurt.jpg' },
+    { name: 'Fresh Fruit Salad', price: 4.5, description: 'Seasonal Portuguese fruits', category: 'sweet', preparationTime: 10, allergens: [], image: '/demo-food/fruit.jpg' },
   ],
 };
 
@@ -176,17 +176,35 @@ async function seedMenuItems(providerId: any, cuisineTypes: string[]) {
     items.push(...MENU_TEMPLATES.healthy);
   }
   
-  // Create menu items
+  // Create or update menu items
   for (const item of items) {
-    await MenuItem.create({
-      providerId,
-      ...item,
-      available: true,
-    });
+    const existing = await MenuItem.findOne({ providerId, name: item.name });
+    if (existing) {
+      // Update existing item with image if missing
+      if (!existing.image && item.image) {
+        existing.image = item.image;
+        await existing.save();
+      }
+    } else {
+      // Create new item
+      await MenuItem.create({
+        providerId,
+        ...item,
+        available: true,
+      });
+    }
   }
 }
 
 let seedingInProgress = false;
+
+// Old providers to delete
+const OLD_PROVIDERS_TO_DELETE = [
+  'Sandwiches de miga',
+  'Panaderia 2',
+  'Panadería LDFP',
+  'Panaderia la artesanal',
+];
 
 export async function ensureLisbonDemoData(): Promise<void> {
   // Prevent concurrent seeding
@@ -198,15 +216,41 @@ export async function ensureLisbonDemoData(): Promise<void> {
   try {
     seedingInProgress = true;
 
+    // Delete old panadería providers if they exist
+    for (const businessName of OLD_PROVIDERS_TO_DELETE) {
+      const oldProvider = await Provider.findOne({ businessName });
+      if (oldProvider) {
+        // Delete menu items first
+        await MenuItem.deleteMany({ providerId: oldProvider._id });
+        // Delete provider
+        await Provider.deleteOne({ _id: oldProvider._id });
+        // Delete user
+        await User.deleteOne({ _id: oldProvider.userId });
+        console.log(`🗑️  Deleted old provider: ${businessName}`);
+      }
+    }
+
     const hashedPassword = await bcrypt.hash('demo1234', 10);
     let createdCount = 0;
+    let updatedCount = 0;
     
     for (const providerData of DEMO_PROVIDERS) {
       // Check if this specific demo provider already exists (by email)
       const existingUser = await User.findOne({ email: providerData.email });
       
       if (existingUser) {
-        // This Lisbon demo provider already exists, skip
+        // This Lisbon demo provider already exists, update it
+        const existingProvider = await Provider.findOne({ userId: existingUser._id });
+        if (existingProvider) {
+          // Update provider image if missing
+          if (!existingProvider.images || existingProvider.images.length === 0) {
+            existingProvider.images = ['/demo-food/pastel-de-nata.jpg'];
+            await existingProvider.save();
+          }
+          // Update/create menu items (seedMenuItems now handles updates)
+          await seedMenuItems(existingProvider._id, providerData.cuisine);
+          updatedCount++;
+        }
         continue;
       }
 
@@ -221,7 +265,7 @@ export async function ensureLisbonDemoData(): Promise<void> {
       // Get coordinates for neighborhood
       const coords = NEIGHBORHOODS[providerData.neighborhood as keyof typeof NEIGHBORHOODS];
       
-      // Create provider
+      // Create provider with image
       const provider = await Provider.create({
         userId: user._id,
         businessName: providerData.businessName,
@@ -241,6 +285,7 @@ export async function ensureLisbonDemoData(): Promise<void> {
           country: 'Portugal',
           coordinates: coords,
         },
+        images: ['/demo-food/pastel-de-nata.jpg'],
         operatingHours: {
           monday: { open: '07:00', close: '11:00' },
           tuesday: { open: '07:00', close: '11:00' },
@@ -272,9 +317,13 @@ export async function ensureLisbonDemoData(): Promise<void> {
     }
     
     if (createdCount > 0) {
-      console.log(`✅ Added ${createdCount} missing Lisbon demo provider(s)`);
-    } else {
-      console.log('✅ All Lisbon demo providers already exist');
+      console.log(`✅ Added ${createdCount} new Lisbon demo provider(s)`);
+    }
+    if (updatedCount > 0) {
+      console.log(`✅ Updated ${updatedCount} existing Lisbon demo provider(s) with images`);
+    }
+    if (createdCount === 0 && updatedCount === 0) {
+      console.log('✅ All Lisbon demo providers up to date');
     }
   } catch (error) {
     console.error('❌ Auto-seed failed:', error);
