@@ -139,6 +139,13 @@ export function ProvidersContent() {
 
       {/* Results Section */}
       <section className="container mx-auto px-6 py-8">
+        {/* Demo notice */}
+        {menuItems.length > 0 && (
+          <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800">
+            <strong>Lisbon demo:</strong> Listings shown are sample data for product demonstration
+          </div>
+        )}
+        
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-text-dark">

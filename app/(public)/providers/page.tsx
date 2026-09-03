@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 import { ProvidersContent } from './providers-content';
 
 export const metadata: Metadata = {
-  title: 'Find Breakfast Providers',
-  description: 'Discover local breakfast providers near your vacation rental',
+  title: 'Lisbon Breakfast Providers',
+  description: 'Browse local pastelarias, padarias, and breakfast providers in Alfama, Bairro Alto, Chiado, and other Lisbon neighborhoods',
 };
 
 export default function ProvidersPage() {

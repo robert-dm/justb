@@ -8,7 +8,8 @@
     "start": "next start -p 3002",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed:lisbon": "tsx scripts/seed-lisbon.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -58,6 +59,7 @@
     "eslint-config-next": "16.1.1",
     "jsdom": "^28.1.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "tw-animate-css": "^1.4.0",
     "typescript": "^5",
     "vitest": "^4.0.18"

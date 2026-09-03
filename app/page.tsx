@@ -72,41 +72,33 @@ export default function HomePage() {
 
       {/* Features */}
       <section className="bg-background-light px-6 py-20">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-4xl">
           <h2 className="mb-12 text-center text-3xl font-bold text-text-dark">
             {t('home', 'whyJustB')}
           </h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <div className="p-6">
-              <h3 className="mb-2 text-lg font-semibold">
-                <span className="mr-2">🌍</span>{t('home', 'authenticFood')}
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-lg bg-white p-6 shadow-sm">
+              <h3 className="mb-2 font-semibold text-text-dark">
+                {t('home', 'authenticFood')}
               </h3>
-              <p className="text-text-light">
+              <p className="text-sm text-text-light">
                 {t('home', 'authenticFoodDesc')}
               </p>
             </div>
-            <div className="p-6">
-              <h3 className="mb-2 text-lg font-semibold">
-                <span className="mr-2">⏰</span>{t('home', 'scheduledDeliveries')}
+            <div className="rounded-lg bg-white p-6 shadow-sm">
+              <h3 className="mb-2 font-semibold text-text-dark">
+                {t('home', 'scheduledDeliveries')}
               </h3>
-              <p className="text-text-light">
+              <p className="text-sm text-text-light">
                 {t('home', 'scheduledDeliveriesDesc')}
               </p>
             </div>
-            <div className="p-6">
-              <h3 className="mb-2 text-lg font-semibold">
-                <span className="mr-2">👨‍🍳</span>{t('home', 'supportLocal')}
+            <div className="rounded-lg bg-white p-6 shadow-sm">
+              <h3 className="mb-2 font-semibold text-text-dark">
+                {t('home', 'supportLocal')}
               </h3>
-              <p className="text-text-light">
+              <p className="text-sm text-text-light">
                 {t('home', 'supportLocalDesc')}
-              </p>
-            </div>
-            <div className="p-6">
-              <h3 className="mb-2 text-lg font-semibold">
-                <span className="mr-2">💳</span>{t('home', 'easyPayment')}
-              </h3>
-              <p className="text-text-light">
-                {t('home', 'easyPaymentDesc')}
               </p>
             </div>
           </div>

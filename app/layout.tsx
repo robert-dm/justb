@@ -17,17 +17,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'justB - Local Breakfast Delivery for Vacation Rentals',
+    default: 'justB — Lisbon breakfast to your rental',
     template: '%s | justB',
   },
   description:
-    'Connect with local breakfast providers and get fresh, authentic meals delivered to your rental. Experience the true taste of your destination.',
+    'Pastel de nata, fresh pão, and galão delivered to your Alfama, Bairro Alto, or Chiado apartment. Local breakfast from neighborhood providers.',
   keywords: [
-    'breakfast delivery',
-    'vacation rental',
-    'local food',
-    'tourist breakfast',
-    'accommodation food',
+    'Lisbon breakfast delivery',
+    'Airbnb breakfast Lisbon',
+    'vacation rental breakfast',
+    'pastel de nata delivery',
+    'Alfama breakfast',
+    'Bairro Alto food',
   ],
 };
 
