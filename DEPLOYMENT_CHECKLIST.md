@@ -11,22 +11,9 @@
 
 ## 🚀 Post-Merge Steps
 
-### 1. Seed the Database
+### 1. Verify the Site (Demo Data Auto-Seeds)
 
-After PR is merged and Vercel deploys the changes:
-
-**Option A: Using curl**
-```bash
-curl -X POST https://justb-psi.vercel.app/api/seed/lisbon
-```
-
-**Option B: Using browser + Postman**
-1. Open Postman or similar tool
-2. Create a new POST request to `https://justb-psi.vercel.app/api/seed/lisbon`
-3. Send the request
-4. Verify response shows 8 providers created
-
-### 2. Verify the Site
+Demo data appears automatically—no manual seeding needed! Just visit the site:
 
 Check these URLs:
 

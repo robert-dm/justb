@@ -3,9 +3,14 @@ import Stripe from 'stripe';
 import connectDB from '@/lib/db';
 import Booking from '@/lib/models/Booking';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-12-15.clover',
-});
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-12-15.clover',
+  });
+}
 
 export async function POST(request: NextRequest) {
   const sig = request.headers.get('stripe-signature');
@@ -17,6 +22,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
+    const stripe = getStripe();
     const body = await request.text();
     event = stripe.webhooks.constructEvent(
       body,

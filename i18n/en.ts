@@ -64,7 +64,7 @@ const en = {
     heroSubtitle: 'Wake up to pastel de nata, fresh pão, and galão delivered to your Alfama, Bairro Alto, or Chiado apartment',
     howItWorks: 'How It Works',
     findProviders: 'Browse Local Pastelarias',
-    findProvidersDesc: 'Explore breakfast menus from neighborhood providers in Lisbon's historic parishes',
+    findProvidersDesc: 'Explore breakfast menus from neighborhood providers in Lisbon historic parishes',
     browseMenus: 'Order Your Breakfast',
     browseMenusDesc: 'Choose from traditional Portuguese and continental options',
     getDelivered: '7–9am Delivery',

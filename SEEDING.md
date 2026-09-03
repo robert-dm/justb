@@ -1,4 +1,4 @@
-# Seeding Lisbon Demo Data
+# Lisbon Demo Data
 
 This project includes demo data for Lisbon breakfast providers to make the marketplace showable for investor/BD presentations.
 
@@ -24,34 +24,15 @@ All seeded data is **for demonstration purposes only**. The providers, menu item
   - Hearty items: ovos mexidos, tosta mista, sandes de presunto
   - Healthy options: açaí bowls, yogurt, fruit salad
 
-## Seeding Methods
+## Auto-Seeding (Default Behavior)
 
-### Option 1: API Route (Recommended for Vercel)
+**Demo data appears automatically** when the database is empty. No manual seeding required!
 
-After deploying to Vercel, seed the database by making a POST request:
+When you visit `/providers` for the first time on an empty database, the app automatically seeds the 8 Lisbon providers with menus. This ensures the marketplace is never empty when shown to investors or Airbnb BD.
 
-```bash
-curl -X POST https://justb-psi.vercel.app/api/seed/lisbon
-```
+## Manual Seeding (Local Development)
 
-Or visit the URL in your browser and use a tool like Postman to send a POST request.
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Lisbon demo data seeded successfully",
-  "data": {
-    "providersCreated": 8,
-    "totalProviders": 8,
-    "totalMenuItems": 48
-  }
-}
-```
-
-### Option 2: Local Script
-
-If running locally with MongoDB:
+If running locally with MongoDB and you want to re-seed:
 
 1. Ensure MongoDB is running
 2. Set up `.env.local` with `MONGODB_URI`

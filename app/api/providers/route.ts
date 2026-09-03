@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import connectDB from '@/lib/db';
 import Provider from '@/lib/models/Provider';
 import { getAuthUser, unauthorizedResponse, errorResponse } from '@/lib/auth';
+import { ensureLisbonDemoData } from '@/lib/seed-lisbon-demo';
 
 // Run location backfill only once per server instance
 let locationBackfillDone = false;
@@ -10,6 +11,9 @@ let locationBackfillDone = false;
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    
+    // Auto-seed demo data if database is empty
+    await ensureLisbonDemoData();
 
     const searchParams = request.nextUrl.searchParams;
     const lat = searchParams.get('lat');

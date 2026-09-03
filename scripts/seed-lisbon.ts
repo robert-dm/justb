@@ -186,15 +186,17 @@ async function clearExistingDemoData() {
   const demoUsers = await User.find({ email: { $regex: /@demo\.justb\.app$/i } });
   const demoUserIds = demoUsers.map(u => u._id);
   
-  // Delete providers belonging to demo users
-  const deletedProviders = await Provider.deleteMany({ userId: { $in: demoUserIds } });
-  console.log(`   Deleted ${deletedProviders.deletedCount} demo providers`);
-  
-  // Find all demo providers and delete their menu items
+  // Find all demo providers BEFORE deleting them
   const demoProviders = await Provider.find({ userId: { $in: demoUserIds } });
   const demoProviderIds = demoProviders.map(p => p._id);
+  
+  // Delete menu items first
   const deletedMenuItems = await MenuItem.deleteMany({ providerId: { $in: demoProviderIds } });
   console.log(`   Deleted ${deletedMenuItems.deletedCount} demo menu items`);
+  
+  // Delete providers
+  const deletedProviders = await Provider.deleteMany({ userId: { $in: demoUserIds } });
+  console.log(`   Deleted ${deletedProviders.deletedCount} demo providers`);
   
   // Delete demo users
   const deletedUsers = await User.deleteMany({ _id: { $in: demoUserIds } });
@@ -256,8 +258,8 @@ async function seedProviders() {
         { time: '09:30', maxOrders: 10 },
       ],
       rating: {
-        average: 4.3 + Math.random() * 0.6, // Random rating between 4.3 and 4.9
-        count: Math.floor(Math.random() * 50) + 10, // Random count between 10 and 60
+        average: 0,
+        count: 0,
       },
       verified: true,
       active: true,

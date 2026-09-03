@@ -1,18 +1,12 @@
 /**
- * API route to seed Lisbon demo data
- * 
- * Usage: POST to /api/seed/lisbon
- * 
- * This route seeds the database with demo providers and menu items for Lisbon.
- * For security, this should only be accessible in development or with proper auth.
+ * Auto-seed Lisbon demo data
+ * This runs automatically when the database is empty to ensure /providers is never empty
  */
 
-import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import connectDB from '@/lib/db';
-import User from '@/lib/models/User';
-import Provider from '@/lib/models/Provider';
-import MenuItem from '@/lib/models/MenuItem';
+import User from './models/User';
+import Provider from './models/Provider';
+import MenuItem from './models/MenuItem';
 
 // Lisbon coordinates for neighborhoods
 const NEIGHBORHOODS = {
@@ -162,19 +156,6 @@ const MENU_TEMPLATES = {
   ],
 };
 
-async function clearExistingDemoData() {
-  // Find all demo users (emails ending with @demo.justb.app)
-  const demoUsers = await User.find({ email: { $regex: /@demo\.justb\.app$/i } });
-  const demoUserIds = demoUsers.map(u => u._id);
-  
-  // Delete providers and menu items
-  await Provider.deleteMany({ userId: { $in: demoUserIds } });
-  const demoProviders = await Provider.find({ userId: { $in: demoUserIds } });
-  const demoProviderIds = demoProviders.map(p => p._id);
-  await MenuItem.deleteMany({ providerId: { $in: demoProviderIds } });
-  await User.deleteMany({ _id: { $in: demoUserIds } });
-}
-
 async function seedMenuItems(providerId: any, cuisineTypes: string[]) {
   const items: any[] = [];
   
@@ -205,16 +186,28 @@ async function seedMenuItems(providerId: any, cuisineTypes: string[]) {
   }
 }
 
-export async function POST(request: NextRequest) {
+let seedingInProgress = false;
+
+export async function ensureLisbonDemoData(): Promise<void> {
+  // Prevent concurrent seeding
+  if (seedingInProgress) {
+    console.log('Demo seed already in progress, skipping...');
+    return;
+  }
+
   try {
-    await connectDB();
+    // Check if we have any providers
+    const providerCount = await Provider.countDocuments();
     
-    // Clear existing demo data
-    await clearExistingDemoData();
-    
+    if (providerCount > 0) {
+      // Data exists, no need to seed
+      return;
+    }
+
+    console.log('No providers found, auto-seeding Lisbon demo data...');
+    seedingInProgress = true;
+
     const hashedPassword = await bcrypt.hash('demo1234', 10);
-    let createdCount = 0;
-    let menuItemCount = 0;
     
     for (const providerData of DEMO_PROVIDERS) {
       // Create user for the provider
@@ -266,8 +259,8 @@ export async function POST(request: NextRequest) {
           { time: '09:30', maxOrders: 10 },
         ],
         rating: {
-          average: 4.3 + Math.random() * 0.6,
-          count: Math.floor(Math.random() * 50) + 10,
+          average: 0,
+          count: 0,
         },
         verified: true,
         active: true,
@@ -275,31 +268,14 @@ export async function POST(request: NextRequest) {
       
       // Create menu items for this provider
       await seedMenuItems(provider._id, providerData.cuisine);
-      createdCount++;
     }
     
-    const totalProviders = await Provider.countDocuments();
-    const totalMenuItems = await MenuItem.countDocuments();
-    menuItemCount = totalMenuItems;
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Lisbon demo data seeded successfully',
-      data: {
-        providersCreated: createdCount,
-        totalProviders,
-        totalMenuItems,
-      },
-    });
-  } catch (error: any) {
-    console.error('Seed error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to seed data',
-        error: error.message,
-      },
-      { status: 500 }
-    );
+    const finalProviderCount = await Provider.countDocuments();
+    const menuItemCount = await MenuItem.countDocuments();
+    console.log(`✅ Auto-seeded ${finalProviderCount} providers with ${menuItemCount} menu items`);
+  } catch (error) {
+    console.error('❌ Auto-seed failed:', error);
+  } finally {
+    seedingInProgress = false;
   }
 }
