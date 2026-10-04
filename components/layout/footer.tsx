@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from '@/hooks';
+import { Logo } from '@/components/ui/logo';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -13,8 +14,8 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           {/* Logo and Copyright */}
           <div className="text-center md:text-left">
-            <Link href="/" className="text-xl font-bold text-primary">
-              🥐 justB
+            <Link href="/">
+              <Logo size="md" />
             </Link>
             <p className="mt-2 text-sm text-text-light">
               &copy; {currentYear} justB. {t('footer', 'allRightsReserved')}

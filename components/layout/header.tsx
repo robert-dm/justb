@@ -14,6 +14,7 @@ import {
 import { User, LogOut, LayoutDashboard, ClipboardList, UtensilsCrossed } from 'lucide-react';
 import { CartSheet } from '@/components/cart';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
+import { Logo } from '@/components/ui/logo';
 
 export function Header() {
   const { user, token, logout } = useAuthStore();
@@ -25,9 +26,9 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
       <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 text-xl font-bold text-primary sm:gap-2 sm:text-2xl">
-          <span>🥐</span>
-          <span>justB</span>
+        <Link href="/" className="flex-shrink-0">
+          <Logo size="sm" className="sm:hidden" />
+          <Logo size="md" className="hidden sm:block" />
         </Link>
 
         {/* Navigation Links */}
