@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     const menuItems = await MenuItem.find(query)
       .populate('providerId', 'businessName rating address images deliveryFee serviceType')
       .sort('-createdAt')
-      .limit(100);
+      .limit(500);
 
     return Response.json({
       success: true,
