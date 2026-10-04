@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, LayoutDashboard, ClipboardList } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, ClipboardList, UtensilsCrossed } from 'lucide-react';
 import { CartSheet } from '@/components/cart';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
 
@@ -23,16 +23,16 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
-      <nav className="container mx-auto flex items-center justify-between px-6 py-4">
+      <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary">
+        <Link href="/" className="flex items-center gap-1.5 text-xl font-bold text-primary sm:gap-2 sm:text-2xl">
           <span>🥐</span>
           <span>justB</span>
         </Link>
 
         {/* Navigation Links */}
-        <ul className="flex items-center gap-6">
-          <li>
+        <ul className="flex flex-wrap items-center justify-end gap-2 sm:gap-4 md:gap-6">
+          <li className="hidden sm:block">
             <Link
               href="/providers"
               className="font-medium text-text-dark transition-colors hover:text-primary"
@@ -41,13 +41,13 @@ export function Header() {
             </Link>
           </li>
 
-          <li>
+          <li className="hidden sm:block">
             <LanguageSwitcher />
           </li>
 
           {isAuthenticated ? (
             <>
-              <li>
+              <li className="hidden md:block">
                 <Link
                   href="/bookings"
                   className="font-medium text-text-dark transition-colors hover:text-primary"
@@ -57,7 +57,7 @@ export function Header() {
               </li>
 
               {isProvider && (
-                <li>
+                <li className="hidden md:block">
                   <Link
                     href="/dashboard"
                     className="font-medium text-text-dark transition-colors hover:text-primary"
@@ -76,9 +76,9 @@ export function Header() {
               <li>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      <span className="max-w-[100px] truncate">{user?.name}</span>
+                    <Button variant="ghost" className="flex items-center gap-1 px-2 sm:gap-2 sm:px-4">
+                      <User className="h-4 w-4 sm:h-5 sm:w-5" />
+                      <span className="hidden max-w-[100px] truncate sm:inline">{user?.name}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -116,7 +116,7 @@ export function Header() {
             </>
           ) : (
             <>
-              <li>
+              <li className="hidden sm:block">
                 <Link
                   href="/login"
                   className="font-medium text-text-dark transition-colors hover:text-primary"
@@ -125,9 +125,33 @@ export function Header() {
                 </Link>
               </li>
               <li>
-                <Button asChild>
+                <Button asChild size="sm" className="h-8 px-3 text-sm sm:h-10 sm:px-4">
                   <Link href="/register">{t('header', 'signUp')}</Link>
                 </Button>
+              </li>
+              <li className="sm:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 px-2">
+                      <User className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link href="/providers" className="flex items-center gap-2">
+                        <UtensilsCrossed className="h-4 w-4" />
+                        {t('header', 'findBreakfast')}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/login" className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        {t('header', 'login')}
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </li>
             </>
           )}
