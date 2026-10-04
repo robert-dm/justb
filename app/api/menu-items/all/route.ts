@@ -73,9 +73,11 @@ export async function GET(request: NextRequest) {
     }
 
     const menuItems = await MenuItem.find(query)
-      .populate('providerId', 'businessName rating address images deliveryFee serviceType')
+      .populate('providerId', 'businessName rating images deliveryFee serviceType cuisine')
+      .select('name description price image category preparationTime allergens providerId')
       .sort('-createdAt')
-      .limit(500);
+      .limit(500)
+      .lean();
 
     return Response.json({
       success: true,

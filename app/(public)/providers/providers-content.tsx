@@ -146,16 +146,18 @@ export function ProvidersContent() {
           </div>
         )}
         
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-text-dark">
               {t('providers', hasLocation ? 'breakfastNearYou' : 'browseBreakfastMenu')}
             </h1>
-            <p className="text-text-light">
-              {viewMode === 'menu'
-                ? `${menuItems.length} item${menuItems.length !== 1 ? 's' : ''} from ${Object.keys(menuItemsByProvider).length} provider${Object.keys(menuItemsByProvider).length !== 1 ? 's' : ''}`
-                : `${providers.length} provider${providers.length !== 1 ? 's' : ''} found`}
-            </p>
+            {!isLoading && (
+              <p className="text-text-light">
+                {viewMode === 'menu'
+                  ? `${menuItems.length} item${menuItems.length !== 1 ? 's' : ''} from ${Object.keys(menuItemsByProvider).length} provider${Object.keys(menuItemsByProvider).length !== 1 ? 's' : ''}`
+                  : `${providers.length} provider${providers.length !== 1 ? 's' : ''} found`}
+              </p>
+            )}
           </div>
 
           {/* View Toggle */}
@@ -164,25 +166,28 @@ export function ProvidersContent() {
               variant={viewMode === 'menu' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('menu')}
+              className="flex-1 sm:flex-none"
             >
-              <UtensilsCrossed className="h-4 w-4 mr-2" />
-              {t('providers', 'menu')}
+              <UtensilsCrossed className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('providers', 'menu')}</span>
             </Button>
             <Button
               variant={viewMode === 'providers' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('providers')}
+              className="flex-1 sm:flex-none"
             >
-              <Store className="h-4 w-4 mr-2" />
-              {t('providers', 'providersLabel')}
+              <Store className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('providers', 'providersLabel')}</span>
             </Button>
             <Button
               variant={viewMode === 'map' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('map')}
+              className="flex-1 sm:flex-none"
             >
-              <MapIcon className="h-4 w-4 mr-2" />
-              {t('providers', 'map')}
+              <MapIcon className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{t('providers', 'map')}</span>
             </Button>
           </div>
         </div>
