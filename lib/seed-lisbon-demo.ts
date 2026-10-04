@@ -137,17 +137,28 @@ const MENU_TEMPLATES = {
     { name: 'Torrada', price: 2.5, description: 'Toasted bread with butter and jam', category: 'traditional', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/bread.jpg' },
     { name: 'Bolo de Arroz', price: 1.8, description: 'Traditional rice cake', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'gluten'], image: '/demo-food/pastel-de-nata.jpg' },
     { name: 'Queijo da Serra', price: 4, description: 'Portuguese mountain cheese with bread', category: 'savory', preparationTime: 5, allergens: ['dairy', 'gluten'], image: '/demo-food/cheese.jpg' },
+    { name: 'Bica', price: 1.2, description: 'Traditional Portuguese espresso', category: 'traditional', preparationTime: 3, allergens: [], image: '/demo-food/coffee.jpg' },
+    { name: 'Meia de Leite', price: 1.8, description: 'Half coffee, half warm milk', category: 'traditional', preparationTime: 5, allergens: ['dairy'], image: '/demo-food/coffee.jpg' },
+    { name: 'Queijada', price: 2.2, description: 'Traditional Portuguese cheese tart', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'dairy', 'gluten'], image: '/demo-food/pastel-de-nata.jpg' },
+    { name: 'Rabanada', price: 3.5, description: 'Portuguese-style French toast with cinnamon', category: 'sweet', preparationTime: 10, allergens: ['eggs', 'dairy', 'gluten'], image: '/demo-food/bread.jpg' },
+    { name: 'Broa de Milho', price: 2.8, description: 'Traditional corn bread with butter', category: 'savory', preparationTime: 5, allergens: ['gluten', 'dairy'], image: '/demo-food/bread.jpg' },
+    { name: 'Pastel de Feijão', price: 1.8, description: 'Sweet bean pastry from Torres Vedras', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'gluten'], image: '/demo-food/pastel-de-nata.jpg' },
+    { name: 'Pão de Deus', price: 2.5, description: 'Sweet bread topped with coconut', category: 'sweet', preparationTime: 5, allergens: ['eggs', 'dairy', 'gluten'], image: '/demo-food/pao-de-deus.jpg' },
   ],
   continental: [
     { name: 'Croissant', price: 2.2, description: 'Butter croissant', category: 'continental', preparationTime: 5, allergens: ['gluten', 'dairy'], image: '/demo-food/croissant.jpg' },
     { name: 'Continental Breakfast', price: 8.5, description: 'Coffee, croissant, juice, and fruit', category: 'continental', preparationTime: 10, allergens: ['gluten', 'dairy'], image: '/demo-food/croissant.jpg' },
     { name: 'Cappuccino', price: 2.8, description: 'Italian-style espresso with steamed milk', category: 'continental', preparationTime: 5, allergens: ['dairy'], image: '/demo-food/coffee.jpg' },
     { name: 'Fresh Orange Juice', price: 3.5, description: 'Freshly squeezed Algarve oranges', category: 'continental', preparationTime: 5, allergens: [], image: '/demo-food/juice.jpg' },
+    { name: 'Sumo Natural', price: 3.2, description: 'Fresh-pressed seasonal fruit juice', category: 'continental', preparationTime: 5, allergens: [], image: '/demo-food/juice.jpg' },
   ],
   hearty: [
     { name: 'Ovos Mexidos com Chouriço', price: 6.5, description: 'Scrambled eggs with Portuguese chorizo', category: 'savory', preparationTime: 12, allergens: ['eggs'], image: '/demo-food/eggs.jpg' },
     { name: 'Tosta Mista', price: 4.5, description: 'Grilled ham and cheese sandwich', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/sandwich.jpg' },
     { name: 'Sandes de Presunto', price: 5, description: 'Portuguese ham sandwich with cheese', category: 'savory', preparationTime: 8, allergens: ['gluten', 'dairy'], image: '/demo-food/sandwich.jpg' },
+    { name: 'Bifana', price: 4.8, description: 'Traditional pork sandwich with spices', category: 'savory', preparationTime: 10, allergens: ['gluten'], image: '/demo-food/sandwich.jpg' },
+    { name: 'Omelete Simples', price: 5.5, description: 'Simple Portuguese omelet with herbs', category: 'savory', preparationTime: 10, allergens: ['eggs', 'dairy'], image: '/demo-food/eggs.jpg' },
+    { name: 'Sande de Queijo', price: 3.8, description: 'Portuguese cheese sandwich with tomato', category: 'savory', preparationTime: 7, allergens: ['gluten', 'dairy'], image: '/demo-food/sandwich.jpg' },
   ],
   healthy: [
     { name: 'Açaí Bowl', price: 7.5, description: 'Açaí with granola, banana, and honey', category: 'sweet', preparationTime: 10, allergens: ['nuts'], image: '/demo-food/acai-bowl.jpg' },
@@ -159,17 +170,16 @@ const MENU_TEMPLATES = {
 async function seedMenuItems(providerId: any, cuisineTypes: string[]) {
   const items: any[] = [];
   
-  // Always add traditional items
-  const traditionalItems = MENU_TEMPLATES.traditional.slice(0, 4);
-  items.push(...traditionalItems);
+  // Add all traditional items (includes new Portuguese items)
+  items.push(...MENU_TEMPLATES.traditional);
   
   // Add cuisine-specific items
   if (cuisineTypes.includes('continental')) {
-    items.push(...MENU_TEMPLATES.continental.slice(0, 3));
+    items.push(...MENU_TEMPLATES.continental);
   }
   
-  if (cuisineTypes.includes('homemade') || cuisineTypes.includes('traditional')) {
-    items.push(...MENU_TEMPLATES.hearty.slice(0, 2));
+  if (cuisineTypes.includes('homemade') || cuisineTypes.includes('traditional') || cuisineTypes.includes('bakery')) {
+    items.push(...MENU_TEMPLATES.hearty);
   }
   
   if (cuisineTypes.includes('healthy') || cuisineTypes.includes('organic')) {
